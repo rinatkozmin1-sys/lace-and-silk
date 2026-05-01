@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
+import { uploadProductImageBuffer } from "@/lib/supabaseProductImage";
 import {
   deleteProductById,
   fetchRecentProductsFromDb,
@@ -65,6 +66,13 @@ function parseAddCaption(caption: string) {
 
 function truncate(str: string, max = 45) {
   return str.length <= max ? str : `${str.slice(0, max - 1)}…`;
+}
+
+function escapeHtml(text: string) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 async function handleAdminDeleteList(chatId: number) {
@@ -178,26 +186,51 @@ async function handleMessage(update: { message?: Record<string, unknown> }) {
       return;
     }
 
-    const imageUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${filePath}`;
-    const { id: newId, error } = await insertProductRow({
-      name: parsed.name,
-      price: parsed.price,
-      image: imageUrl,
-      category: parsed.category,
+    const telegramFileUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${filePath}`;
+    const imageRes = await fetch(telegramFileUrl);
+    if (!imageRes.ok) {
+      await sendMessage(
+        chatId,
+        `Не удалось скачать фото из Telegram (код ${imageRes.status}). Попробуйте отправить снимок ещё раз.`
+      );
+      return;
+    }
+
+    const buffer = await imageRes.arrayBuffer();
+    const responseContentType = imageRes.headers.get("content-type");
+
+    const { publicUrl, error: uploadError } = await uploadProductImageBuffer({
+      buffer,
+      telegramFilePath: filePath,
+      responseContentType,
     });
 
-    if (error || !newId) {
-      await sendMessage(chatId, `Не удалось сохранить товар: ${error ?? "неизвестная ошибка"}`);
+    if (uploadError || !publicUrl) {
+      await sendMessage(
+        chatId,
+        `Не удалось загрузить изображение в Supabase Storage: ${uploadError ?? "неизвестная ошибка"}. Проверьте, что бакет «products» создан (см. supabase/storage-products.sql).`
+      );
+      return;
+    }
+
+    const { error: insertError } = await insertProductRow({
+      name: parsed.name.trim(),
+      price: parsed.price,
+      image: publicUrl,
+      category: parsed.category.trim(),
+    });
+
+    if (insertError) {
+      await sendMessage(
+        chatId,
+        `Фото загружено, но не удалось сохранить товар в базу: ${insertError}`
+      );
       return;
     }
 
     await sendMessage(
       chatId,
-      `✅ Товар добавлен в Supabase:\n` +
-        `id: <code>${newId}</code>\n` +
-        `Название: ${parsed.name}\n` +
-        `Цена: ${parsed.price}\n` +
-        `Категория: ${parsed.category}`,
+      `✅ Товар ${escapeHtml(parsed.name.trim())} успешно добавлен в каталог!`,
       adminKeyboard()
     );
   }
