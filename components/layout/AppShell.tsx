@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { CartProvider } from "@/lib/cart";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
@@ -10,7 +11,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <I18nProvider>
       <CartProvider>
-        <Header />
+        <Suspense fallback={<div></div>}>
+          <Header />
+        </Suspense>
         <main>{children}</main>
         <Footer />
         <CartDrawer />

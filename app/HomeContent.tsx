@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Hero } from "@/components/layout/Hero";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
 import { products, type Material } from "@/lib/products";
@@ -17,14 +17,16 @@ export function HomeContent() {
   return (
     <div className="space-y-10">
       {isHomeShowcase && <Hero />}
-      <ProductGrid
-        allProducts={products}
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
-        onBackToTypes={() => setSelectedCategory(null)}
-        onAddToCart={addItem}
-        fxRates={fx.rates}
-      />
+      <Suspense fallback={<div></div>}>
+        <ProductGrid
+          allProducts={products}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+          onBackToTypes={() => setSelectedCategory(null)}
+          onAddToCart={addItem}
+          fxRates={fx.rates}
+        />
+      </Suspense>
     </div>
   );
 }
