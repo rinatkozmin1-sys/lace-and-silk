@@ -160,13 +160,7 @@ export function ProductGrid({
 
   useEffect(() => {
     const onScroll = () => {
-      const catalog = document.getElementById("catalog");
-      if (!catalog) {
-        setShowScrollTopButton(false);
-        return;
-      }
-      const catalogTop = catalog.getBoundingClientRect().top + window.scrollY;
-      setShowScrollTopButton(window.scrollY > catalogTop + 320);
+      setShowScrollTopButton(window.scrollY > 300);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -339,7 +333,7 @@ export function ProductGrid({
           type="button"
           onClick={scrollCatalogToTopSmooth}
           aria-label="Наверх"
-          className="fixed bottom-5 right-5 z-40 hidden h-11 w-11 items-center justify-center rounded-full border border-primary/20 bg-accent/30 text-primary shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-accent/45 hover:shadow-lg md:inline-flex"
+          className="fixed bottom-5 right-5 z-50 inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-gray-200 text-gray-700 shadow-md transition-all duration-300 hover:bg-gray-300 hover:shadow-lg"
         >
           <ChevronUp className="h-5 w-5" />
         </button>

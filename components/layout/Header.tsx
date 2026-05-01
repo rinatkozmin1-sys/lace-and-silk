@@ -58,14 +58,17 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-primary/10 bg-body/95 backdrop-blur supports-[backdrop-filter]:bg-body/80">
       <Container>
-        <div className="flex h-14 items-center justify-between gap-4 sm:h-16">
-          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
+        <div className="py-2 md:flex md:h-16 md:items-center md:justify-between md:py-0">
+          <div className="flex justify-center md:justify-start">
             <Link
               href="/"
-              className="truncate font-serif text-xl font-medium text-primary sm:text-2xl"
+              className="truncate text-center font-serif text-2xl font-medium text-primary sm:text-3xl md:text-2xl"
             >
               Hristianskyi style
             </Link>
+          </div>
+
+          <div className="mt-2 flex shrink-0 items-center justify-center gap-1 md:mt-0 md:justify-end">
             <label className="sr-only" htmlFor="lang-select">
               {t("header.language")}
             </label>
@@ -81,8 +84,6 @@ export function Header() {
                 </option>
               ))}
             </select>
-          </div>
-          <div className="flex shrink-0 items-center gap-1">
             <button
               type="button"
               onClick={openCart}
