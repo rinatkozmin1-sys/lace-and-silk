@@ -98,11 +98,20 @@ export function ProductGrid({
     if (!isSearching && selectedCategory) {
       return filteredProducts.filter((p) => p.category === selectedCategory);
     }
+    /* «Все», без поиска и без выбранного типа: обычно показываем только сетку типов.
+       Если типов нет (например категории из бота не совпадают с фиксированным списком Material),
+       показываем все товары карточками. */
+    if (typeCards.length === 0 && filteredProducts.length > 0) {
+      return filteredProducts;
+    }
     return [];
-  }, [filteredProducts, pillFilter, isSearching, selectedCategory]);
+  }, [filteredProducts, pillFilter, isSearching, selectedCategory, typeCards.length]);
 
   const showLevel1Types =
-    pillFilter === "all" && !isSearching && selectedCategory === null;
+    pillFilter === "all" &&
+    !isSearching &&
+    selectedCategory === null &&
+    typeCards.length > 0;
 
   const catalogHeading = useMemo(() => {
     if (showLevel1Types) return null;

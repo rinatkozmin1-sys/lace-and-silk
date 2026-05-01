@@ -8,6 +8,22 @@ export type ProductRow = {
   category: string;
 };
 
+function normalizePrice(raw: unknown): number {
+  if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+  const n = Number.parseFloat(String(raw ?? "").replace(",", "."));
+  return Number.isFinite(n) ? n : 0;
+}
+
+function rowFromDb(row: Record<string, unknown>): ProductRow {
+  return {
+    id: Number(row.id),
+    name: typeof row.name === "string" ? row.name : String(row.name ?? ""),
+    price: normalizePrice(row.price),
+    image: typeof row.image === "string" ? row.image : String(row.image ?? ""),
+    category: typeof row.category === "string" ? row.category : String(row.category ?? ""),
+  };
+}
+
 export async function fetchAllProductsFromDb(): Promise<{
   data: ProductRow[];
   error: string | null;
@@ -27,7 +43,8 @@ export async function fetchAllProductsFromDb(): Promise<{
     .order("id", { ascending: true });
 
   if (error) return { data: [], error: error.message };
-  return { data: (data ?? []) as ProductRow[], error: null };
+  const rows = (data ?? []) as Record<string, unknown>[];
+  return { data: rows.map(rowFromDb), error: null };
 }
 
 export async function fetchRecentProductsFromDb(limit: number): Promise<{
@@ -50,7 +67,8 @@ export async function fetchRecentProductsFromDb(limit: number): Promise<{
     .limit(limit);
 
   if (error) return { data: [], error: error.message };
-  return { data: (data ?? []) as ProductRow[], error: null };
+  const rows = (data ?? []) as Record<string, unknown>[];
+  return { data: rows.map(rowFromDb), error: null };
 }
 
 export async function insertProductRow(input: {

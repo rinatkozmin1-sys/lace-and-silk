@@ -27,13 +27,27 @@ function localizeName(name: string): LocalizedText {
   };
 }
 
-function toUiProduct(row: ProductApiRow): Product {
-  const normalizedCategory = row.category as Material;
+function toUiProduct(row: ProductApiRow, index: number): Product {
+  const titleFromDb = typeof row.name === "string" ? row.name.trim() : "";
+  const categoryFromDb = typeof row.category === "string" ? row.category.trim() : "";
+  let priceVal =
+    typeof row.price === "number" && Number.isFinite(row.price)
+      ? row.price
+      : Number.parseFloat(String(row.price ?? "").replace(",", "."));
+  if (!Number.isFinite(priceVal)) priceVal = 0;
+
+  const idStr =
+    row.id !== undefined && row.id !== null && String(row.id) !== ""
+      ? String(row.id)
+      : `product-${index}`;
+
+  const normalizedCategory = categoryFromDb as Material;
+
   return {
-    id: String(row.id),
-    name: localizeName(row.name),
-    image: row.image,
-    price: Number(row.price),
+    id: idStr,
+    name: localizeName(titleFromDb),
+    image: typeof row.image === "string" ? row.image : "",
+    price: priceVal,
     category: normalizedCategory,
     material: normalizedCategory,
     badge: null,
@@ -60,7 +74,7 @@ export function HomeContent() {
           setProductsError(json.error ?? "Не удалось загрузить товары из Supabase.");
           setProducts(fallbackProducts);
         } else {
-          setProducts(json.products.map(toUiProduct));
+          setProducts(json.products.map((row, i) => toUiProduct(row, i)));
           setProductsError(null);
         }
       } catch {
