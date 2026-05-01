@@ -28,12 +28,14 @@ export type LocalizedText = {
 export interface Product {
   id: string;
   name: LocalizedText;
+  /** Опционально: участвует в фильтре пилюль наряду с `name` и `category` */
+  title?: LocalizedText;
   image: string;
   price: number;
   /** Категория для фильтра каталога (совпадает с `material` у текущих товаров) */
   category: Material;
   material: Material;
-  
+
   badge: Badge;
 }
 

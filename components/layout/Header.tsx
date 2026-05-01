@@ -6,6 +6,7 @@ import { Search, ShoppingBag, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/lib/cart";
 import { Container } from "./Container";
+import { CurrencySwitcher } from "./CurrencySwitcher";
 import { IconButton } from "@/components/ui/IconButton";
 import { cn } from "@/lib/utils";
 import { useI18n, type Lang } from "@/lib/i18n";
@@ -82,6 +83,25 @@ export function Header() {
             </select>
           </div>
           <div className="flex shrink-0 items-center gap-1">
+            <button
+              type="button"
+              onClick={openCart}
+              aria-label={t("header.cart")}
+              className="relative inline-flex items-center justify-center rounded-full p-2 text-primary transition-colors hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-accent/50"
+            >
+              <ShoppingBag className="h-5 w-5 sm:h-6 sm:w-6" />
+              {totalCount > 0 && (
+                <span
+                  className={cn(
+                    "absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-medium text-white",
+                    totalCount > 99 && "min-w-4 px-0.5"
+                  )}
+                >
+                  {totalCount > 99 ? "99+" : totalCount}
+                </span>
+              )}
+            </button>
+            <CurrencySwitcher />
             <div className="flex items-center">
               <div
                 className={cn(
@@ -132,24 +152,6 @@ export function Header() {
                 <Search className="h-5 w-5 sm:h-6 sm:w-6" />
               </IconButton>
             </div>
-            <button
-              type="button"
-              onClick={openCart}
-              aria-label={t("header.cart")}
-              className="relative inline-flex items-center justify-center rounded-full p-2 text-primary transition-colors hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-accent/50"
-            >
-              <ShoppingBag className="h-5 w-5 sm:h-6 sm:w-6" />
-              {totalCount > 0 && (
-                <span
-                  className={cn(
-                    "absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-medium text-white",
-                    totalCount > 99 && "min-w-4 px-0.5"
-                  )}
-                >
-                  {totalCount > 99 ? "99+" : totalCount}
-                </span>
-              )}
-            </button>
           </div>
         </div>
       </Container>

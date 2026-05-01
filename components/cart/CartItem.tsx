@@ -4,9 +4,7 @@ import Image from "next/image";
 import { Minus, Plus, X } from "lucide-react";
 import type { CartItem as CartItemType } from "@/lib/cart";
 import { IconButton } from "@/components/ui/IconButton";
-import { cn } from "@/lib/utils";
-import type { FxRates } from "@/lib/fx";
-import { PriceFx, type FxCurrency } from "@/components/ui/PriceFx";
+import { PriceFx } from "@/components/ui/PriceFx";
 import { useI18n } from "@/lib/i18n";
 
 export function CartItem({
@@ -14,17 +12,11 @@ export function CartItem({
   onIncrement,
   onDecrement,
   onRemove,
-  fxRates,
-  selectedCurrency,
-  onSelectCurrency,
 }: {
   item: CartItemType;
   onIncrement: () => void;
   onDecrement: () => void;
   onRemove: () => void;
-  fxRates: FxRates | null;
-  selectedCurrency: FxCurrency | null;
-  onSelectCurrency: (c: FxCurrency) => void;
 }) {
   const { lang, t } = useI18n();
   const { product, quantity } = item;
@@ -44,45 +36,20 @@ export function CartItem({
         />
       </div>
       <div className="min-w-0 flex-1">
-        <h3 className="font-product text-xl md:text-2xl font-medium text-primary leading-tight">
+        <h3 className="font-product text-xl font-medium leading-tight text-primary md:text-2xl">
           {name}
         </h3>
         <p className="text-sm text-primary/70">{product.material}</p>
-        <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <div className="mt-1 space-y-0.5">
           <div className="text-primary">
-            <PriceFx
-              amountKzt={product.price}
-              rates={fxRates}
-              selectedCurrency={selectedCurrency}
-              onSelectCurrency={onSelectCurrency}
-            />
+            <PriceFx amountKzt={product.price} className="text-sm md:text-base" />
           </div>
-          <div className={cn("text-sm text-primary/70", quantity > 1 && "font-medium")}>
-            {quantity > 1 ? (
-              <span className="tabular-nums">
-                {t("cart.sum")}: {lineTotal.toLocaleString("ru-KZ")} ₸
-                {selectedCurrency && fxRates && (
-                  <span className="text-primary/70 tabular-nums">
-                    {" "}
-                    (
-                    {new Intl.NumberFormat(
-                      selectedCurrency === "RUB" ? "ru-RU" : "en-US",
-                      {
-                        style: "currency",
-                        currency: selectedCurrency,
-                        maximumFractionDigits: selectedCurrency === "RUB" ? 0 : 2,
-                      }
-                    ).format(lineTotal * fxRates[selectedCurrency])}
-                    )
-                  </span>
-                )}
-              </span>
-            ) : (
-              <span className="tabular-nums">
-                {t("cart.sum")}: {lineTotal.toLocaleString("ru-KZ")} ₸
-              </span>
-            )}
-          </div>
+          {quantity > 1 && (
+            <div className="text-sm text-primary/70">
+              {t("cart.sum")}:{" "}
+              <PriceFx amountKzt={lineTotal} className="text-sm font-medium text-primary/90" />
+            </div>
+          )}
         </div>
         <div className="mt-2 flex items-center gap-2">
           <div className="inline-flex items-center rounded-lg border border-primary/20">

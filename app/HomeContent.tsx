@@ -1,30 +1,38 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useCallback, useState } from "react";
 import { Hero } from "@/components/layout/Hero";
+import { CategoryPills } from "@/components/catalog/CategoryPills";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
+import type { CatalogPillFilter } from "@/lib/catalogPillFilter";
 import { products, type Material } from "@/lib/products";
 import { useCart } from "@/lib/cart";
-import { useFxRates } from "@/lib/useFxRates";
 
 export function HomeContent() {
   const { addItem } = useCart();
-  /** null — уровень 1 (карточки видов), иначе — товары выбранной категории */
+  const [pillFilter, setPillFilter] = useState<CatalogPillFilter>("all");
   const [selectedCategory, setSelectedCategory] = useState<Material | null>(null);
-  const fx = useFxRates();
-  const isHomeShowcase = selectedCategory === null;
+
+  const handleSelectPill = useCallback((pill: CatalogPillFilter) => {
+    setPillFilter(pill);
+    setSelectedCategory(null);
+  }, []);
 
   return (
     <div className="space-y-10">
-      {isHomeShowcase && <Hero />}
+      <Hero
+        belowCatalog={
+          <CategoryPills selected={pillFilter} onSelect={handleSelectPill} />
+        }
+      />
       <Suspense fallback={<div></div>}>
         <ProductGrid
           allProducts={products}
+          pillFilter={pillFilter}
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
           onBackToTypes={() => setSelectedCategory(null)}
           onAddToCart={addItem}
-          fxRates={fx.rates}
         />
       </Suspense>
     </div>

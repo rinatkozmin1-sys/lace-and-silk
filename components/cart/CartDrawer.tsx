@@ -6,25 +6,36 @@ import { Drawer } from "@/components/ui/Drawer";
 import { CartItem } from "./CartItem";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
+import { PriceFx } from "@/components/ui/PriceFx";
+import { CurrencySwitcher } from "@/components/layout/CurrencySwitcher";
+import { formatFxAmount } from "@/lib/fxFormat";
+import type { FxRates } from "@/lib/fx";
+import { useFxCurrency, type FxCurrency } from "@/lib/fxCurrency";
 import { useFxRates } from "@/lib/useFxRates";
-import type { FxCurrency } from "@/components/ui/PriceFx";
-import { useMemo, useState } from "react";
 import { useI18n, type Lang } from "@/lib/i18n";
 
-function buildOrderMessage(items: CartLine[], totalPrice: number, lang: Lang) {
+function buildOrderMessage(
+  items: CartLine[],
+  totalPrice: number,
+  lang: Lang,
+  currency: FxCurrency,
+  rates: FxRates | null
+) {
   const orderLines = items
     .map((item) => {
       const name = item.product.name[lang] ?? item.product.name.ru;
-      const unit = item.product.price.toLocaleString("ru-KZ");
-      return `- ${name} (${unit} ₸) × ${item.quantity}`;
+      const unit = formatFxAmount(item.product.price, currency, rates);
+      return `- ${name} (${unit}) × ${item.quantity}`;
     })
-    .join("%0A");
-  const total = totalPrice.toLocaleString("ru-KZ");
-  return `Здравствуйте! Хочу оформить заказ:%0A${orderLines}%0A%0AИтого: ${total} ₸`;
+    .join("\n");
+  const total = formatFxAmount(totalPrice, currency, rates);
+  return `Здравствуйте! Хочу оформить заказ:\n${orderLines}\n\nИтого: ${total}`;
 }
 
 export function CartDrawer() {
   const { t, lang } = useI18n();
+  const { currency } = useFxCurrency();
+  const { rates } = useFxRates();
   const {
     items,
     totalPrice,
@@ -34,92 +45,75 @@ export function CartDrawer() {
     decrement,
     removeItem,
   } = useCart();
-  const fx = useFxRates();
-  const [selectedById, setSelectedById] = useState<Record<string, FxCurrency | null>>({});
 
-  const totalConverted = useMemo(() => {
-    const anySelected = Object.values(selectedById).find(Boolean) ?? null;
-    if (!anySelected || !fx.rates) return null;
-    const rate = fx.rates[anySelected];
-    return { currency: anySelected, value: totalPrice * rate };
-  }, [fx.rates, selectedById, totalPrice]);
+  const openOrderLink = (baseUrl: string) => {
+    const message = buildOrderMessage(items, totalPrice, lang, currency, rates);
+    const url = `${baseUrl}${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
+  };
 
   return (
     <Drawer open={isOpen} onClose={closeCart} title={t("cart.title")} side="right">
-      <div className="flex h-14 shrink-0 items-center justify-between border-b border-primary/10 px-4">
-        <h2 className="font-serif text-lg font-medium text-primary">
+      <div className="relative z-30 flex h-14 shrink-0 items-center gap-2 border-b border-primary/10 px-4">
+        <h2 className="min-w-0 flex-1 truncate font-serif text-lg font-medium text-primary">
           {t("cart.title")}
         </h2>
-        <IconButton aria-label="Закрыть" onClick={closeCart}>
-          <X className="h-5 w-5" />
-        </IconButton>
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <span className="hidden whitespace-nowrap text-xs font-medium text-primary/70 sm:inline">
+            {t("cart.currency")}
+          </span>
+          <CurrencySwitcher />
+          <IconButton aria-label="Закрыть" onClick={closeCart}>
+            <X className="h-5 w-5" />
+          </IconButton>
+        </div>
       </div>
-      <div className="flex-1 overflow-y-auto px-4">
-        {items.length === 0 ? (
-          <p className="py-12 text-center text-primary/70">
-            {t("cart.empty")}
-          </p>
-        ) : (
-          <ul className="py-4">
-            {items.map((item) => (
-              <li key={item.product.id}>
-                <CartItem
-                  item={item}
-                  onIncrement={() => increment(item.product.id)}
-                  onDecrement={() => decrement(item.product.id)}
-                  onRemove={() => removeItem(item.product.id)}
-                  fxRates={fx.rates}
-                  selectedCurrency={selectedById[item.product.id] ?? null}
-                  onSelectCurrency={(c) =>
-                    setSelectedById((prev) => ({ ...prev, [item.product.id]: c }))
-                  }
-                />
-              </li>
-            ))}
-          </ul>
-        )}
+      <div className="relative z-0 flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto px-4">
+          {items.length === 0 ? (
+            <p className="py-12 text-center text-primary/70">
+              {t("cart.empty")}
+            </p>
+          ) : (
+            <ul className="py-4">
+              {items.map((item) => (
+                <li key={item.product.id}>
+                  <CartItem
+                    item={item}
+                    onIncrement={() => increment(item.product.id)}
+                    onDecrement={() => decrement(item.product.id)}
+                    onRemove={() => removeItem(item.product.id)}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
       {items.length > 0 && (
-          <div className="shrink-0 border-t border-primary/10 bg-body p-4">
-            <div className="flex items-center justify-between text-lg font-medium">
-              <span>{t("cart.total")}</span>
-              <span className="text-right">
-                <div>{totalPrice.toLocaleString("ru-KZ")} ₸</div>
-                {totalConverted && (
-                  <div className="mt-0.5 text-xs text-primary/70 tabular-nums">
-                    ({new Intl.NumberFormat(totalConverted.currency === "RUB" ? "ru-RU" : "en-US", {
-                      style: "currency",
-                      currency: totalConverted.currency,
-                      maximumFractionDigits: totalConverted.currency === "RUB" ? 0 : 2,
-                    }).format(totalConverted.value)})
-                  </div>
-                )}
-              </span>
-            </div>
-
-            <div className="flex flex-col gap-3 mt-4 w-full">
-              <Button 
-                className="w-full bg-[#25D366] hover:bg-[#20b858] text-white py-3 text-base transition-colors" 
-                onClick={() => {
-                  const message = buildOrderMessage(items, totalPrice, lang);
-                  window.open("https://wa.me/77054161614?text=" + message, "_blank");
-                }}
-              >
-                {t("cart.orderWhatsapp")}
-              </Button>
-
-              <Button 
-                className="w-full bg-[#0088cc] hover:bg-[#0077b3] text-white py-3 text-base transition-colors" 
-                onClick={() => {
-                  const message = buildOrderMessage(items, totalPrice, lang);
-                  window.open("https://t.me/Шарфики_Косынки?text=" + message, "_blank");
-                }}
-              >
-                {t("cart.orderTelegram")}
-              </Button>
-            </div>
+        <div className="relative z-10 shrink-0 border-t border-primary/10 bg-body p-4">
+          <div className="flex items-center justify-between text-lg font-medium">
+            <span>{t("cart.total")}</span>
+            <PriceFx amountKzt={totalPrice} className="text-lg font-medium" />
           </div>
-        )}
-      </Drawer>
-    );
-  }
+
+          <div className="mt-4 flex w-full flex-col gap-3">
+            <Button
+              className="w-full bg-[#25D366] py-3 text-base text-white transition-colors hover:bg-[#20b858]"
+              onClick={() => openOrderLink("https://wa.me/77054161614?text=")}
+            >
+              {t("cart.orderWhatsapp")}
+            </Button>
+
+            <Button
+              className="w-full bg-[#0088cc] py-3 text-base text-white transition-colors hover:bg-[#0077b3]"
+              onClick={() => openOrderLink("https://t.me/Шарфики_Косынки?text=")}
+            >
+              {t("cart.orderTelegram")}
+            </Button>
+          </div>
+        </div>
+      )}
+    </Drawer>
+  );
+}

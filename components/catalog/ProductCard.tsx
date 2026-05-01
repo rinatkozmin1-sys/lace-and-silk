@@ -2,18 +2,16 @@
 
 import Image from "next/image";
 import { Product } from "@/lib/products";
-import type { FxRates } from "@/lib/fx";
 import { PriceFx } from "@/components/ui/PriceFx";
 import { useI18n } from "@/lib/i18n";
 
 interface ProductCardProps {
   product: Product;
   onAddToCart: (p: Product) => void;
-  fxRates: FxRates | null;
   setSelectedImage: (url: string | null) => void;
 }
 
-export function ProductCard({ product, onAddToCart, fxRates, setSelectedImage }: ProductCardProps) {
+export function ProductCard({ product, onAddToCart, setSelectedImage }: ProductCardProps) {
   const { lang, t } = useI18n();
   const name = product.name[lang] ?? product.name.ru;
   return (
@@ -45,7 +43,7 @@ export function ProductCard({ product, onAddToCart, fxRates, setSelectedImage }:
           {name}
         </h3>
 
-        <PriceFx amountKzt={product.price} rates={fxRates} className="text-xs md:text-sm" />
+        <PriceFx amountKzt={product.price} className="text-xs md:text-sm" />
       </div>
 
       {/* Кнопка: светлая рамка и рабочая логика */}
