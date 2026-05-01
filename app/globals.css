@@ -1,0 +1,37 @@
+html {
+  scroll-behavior: smooth;
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  .category-btn {
+    @apply px-4 py-1.5 rounded-full font-product text-lg transition-colors border;
+    @apply bg-cream/80 hover:bg-cream text-primary/80 border-primary/20;
+  }
+  .category-btn.active {
+    @apply bg-cream text-primary border-primary/30 shadow-sm;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
