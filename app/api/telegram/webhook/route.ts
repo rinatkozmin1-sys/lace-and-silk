@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
  * ID админов Telegram (ваш и мамы).
  * Пример: [123456789, 987654321]
  */
-const ADMIN_IDS: number[] = [];
+const ADMIN_IDS = [1190387482, 8558185894];
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ?? "";
 
