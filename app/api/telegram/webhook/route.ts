@@ -15,12 +15,32 @@ export const dynamic = "force-dynamic";
  */
 const ADMIN_IDS: number[] = [];
 
-const ACCESS_DENIED = "Извините, у вас нет прав доступа к этой команде";
-
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ?? "";
 
 function isAdmin(userId?: number) {
   return typeof userId === "number" && ADMIN_IDS.includes(userId);
+}
+
+/** Сообщение при попытке недопустимой для пользователя команды (не в ADMIN_IDS). */
+function accessDeniedText(userId?: number) {
+  const idLabel = typeof userId === "number" ? String(userId) : "неизвестно";
+  return `❌ Отказано в доступе. Ваш ID: ${idLabel}`;
+}
+
+function extractChatIdFromUpdate(update: unknown): number | undefined {
+  if (!update || typeof update !== "object") return undefined;
+  const u = update as Record<string, unknown>;
+  const msg = u.message;
+  if (msg && typeof msg === "object" && "chat" in msg) {
+    const chat = (msg as { chat?: { id?: number } }).chat;
+    if (typeof chat?.id === "number") return chat.id;
+  }
+  const cq = u.callback_query;
+  if (cq && typeof cq === "object" && "message" in cq) {
+    const m = (cq as { message?: { chat?: { id?: number } } }).message;
+    if (typeof m?.chat?.id === "number") return m.chat.id;
+  }
+  return undefined;
 }
 
 async function tgApi(method: string, payload: Record<string, unknown>) {
@@ -42,6 +62,14 @@ async function sendMessage(
     text,
     parse_mode: "HTML",
     ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
+  });
+}
+
+/** Без HTML-разметки (ошибки сервера и прочий «сырой» текст). */
+async function sendPlainMessage(chatId: number, text: string) {
+  await tgApi("sendMessage", {
+    chat_id: chatId,
+    text: text.slice(0, 4096),
   });
 }
 
@@ -113,17 +141,13 @@ async function handleMessage(update: { message?: Record<string, unknown> }) {
   const text: string = typeof message.text === "string" ? message.text : "";
 
   if (text.startsWith("/start")) {
-    await sendMessage(
-      chatId,
-      "Здравствуйте! Ассортимент смотрите на сайте магазина.\n\n" +
-        "Если вы администратор, откройте панель: /admin"
-    );
+    await sendPlainMessage(chatId, "Бот работает, жду команду /admin или фото товара.");
     return;
   }
 
   if (text.startsWith("/admin")) {
     if (!isAdmin(userId)) {
-      await sendMessage(chatId, ACCESS_DENIED);
+      await sendPlainMessage(chatId, accessDeniedText(userId));
       return;
     }
     await sendMessage(
@@ -140,7 +164,7 @@ async function handleMessage(update: { message?: Record<string, unknown> }) {
 
   if (text.startsWith("/delete")) {
     if (!isAdmin(userId)) {
-      await sendMessage(chatId, ACCESS_DENIED);
+      await sendPlainMessage(chatId, accessDeniedText(userId));
       return;
     }
     const [, id] = text.split(/\s+/, 2);
@@ -162,7 +186,7 @@ async function handleMessage(update: { message?: Record<string, unknown> }) {
 
   if (photos && photos.length > 0 && caption) {
     if (!isAdmin(userId)) {
-      await sendMessage(chatId, ACCESS_DENIED);
+      await sendPlainMessage(chatId, accessDeniedText(userId));
       return;
     }
 
@@ -270,7 +294,7 @@ async function handleCallback(update: { callback_query?: Record<string, unknown>
   await tgApi("answerCallbackQuery", { callback_query_id: callbackId });
 
   if (isAdminCallback(data) && !isAdmin(userId)) {
-    await sendMessage(chatId, ACCESS_DENIED);
+    await sendPlainMessage(chatId, accessDeniedText(userId));
     return;
   }
 
@@ -314,6 +338,15 @@ async function handleCallback(update: { callback_query?: Record<string, unknown>
 }
 
 export async function POST(req: Request) {
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
+  }
+
+  console.log("Получено сообщение от Телеграм:", body);
+
   if (!BOT_TOKEN) {
     return NextResponse.json(
       { ok: false, error: "TELEGRAM_BOT_TOKEN is not configured" },
@@ -332,13 +365,22 @@ export async function POST(req: Request) {
     );
   }
 
-  const update = await req.json();
+  const update = body as {
+    message?: Record<string, unknown>;
+    callback_query?: Record<string, unknown>;
+  };
+
   try {
     await handleCallback(update);
     await handleMessage(update);
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Webhook error";
-    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
+    console.error("Telegram webhook handler error:", error);
+    const errText = error instanceof Error ? error.message : String(error);
+    const chatId = extractChatIdFromUpdate(update);
+    if (chatId !== undefined) {
+      await sendPlainMessage(chatId, `⚠️ Ошибка сервера: ${errText}`);
+    }
+    return NextResponse.json({ ok: true });
   }
 
   return NextResponse.json({ ok: true });
