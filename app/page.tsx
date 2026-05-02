@@ -1,18 +1,12 @@
 import { HomeContent } from "./HomeContent";
-import { catalogPayloadFromDb } from "@/lib/catalogProductMapper";
-import { fetchAllProducts } from "@/lib/supabaseProductsServer";
 
-/** Данные каталога читаются на сервере из Supabase (без fetch к своему API). */
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default async function Home() {
-  const { data, error } = await fetchAllProducts();
-  const catalogPayload = catalogPayloadFromDb(data, error);
-
+export default function Home() {
   return (
     <div className="min-h-screen bg-body">
-      <HomeContent catalogPayload={catalogPayload} />
+      <HomeContent />
     </div>
   );
 }

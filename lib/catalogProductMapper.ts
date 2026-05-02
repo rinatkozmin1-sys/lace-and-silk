@@ -1,4 +1,4 @@
-import type { ProductRow } from "@/lib/supabaseProductsServer";
+import type { ProductRow } from "@/lib/catalogProductQuery";
 import type { LocalizedText, Material, Product } from "@/lib/products";
 
 function localizeName(name: string): LocalizedText {

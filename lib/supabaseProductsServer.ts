@@ -1,32 +1,11 @@
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
+import type { ProductRow } from "@/lib/catalogProductQuery";
+import { loadCatalogProductRows, loadRecentProductRows } from "@/lib/catalogProductQuery";
 
-export type ProductRow = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-};
-
-function normalizePrice(raw: unknown): number {
-  if (typeof raw === "number" && Number.isFinite(raw)) return raw;
-  const n = Number.parseFloat(String(raw ?? "").replace(",", "."));
-  return Number.isFinite(n) ? n : 0;
-}
-
-function rowFromDb(row: Record<string, unknown>): ProductRow {
-  return {
-    id: Number(row.id),
-    name: typeof row.name === "string" ? row.name : String(row.name ?? ""),
-    price: normalizePrice(row.price),
-    image: typeof row.image === "string" ? row.image : String(row.image ?? ""),
-    category: typeof row.category === "string" ? row.category : String(row.category ?? ""),
-  };
-}
+export type { ProductRow };
 
 /**
- * Все товары каталога из Supabase. Только SDK (`supabase.from`), без `fetch` к своему API —
- * иначе на Vercel в RSC возможна ошибка вида «Invalid path specified in request URL».
+ * Все товары каталога из Supabase (service role). Только SDK, без fetch к своему API.
  */
 export async function fetchAllProducts(): Promise<{
   data: ProductRow[];
@@ -40,17 +19,7 @@ export async function fetchAllProducts(): Promise<{
         "Supabase не настроен для сервера: задайте NEXT_PUBLIC_SUPABASE_URL и SUPABASE_SERVICE_ROLE_KEY.",
     };
   }
-
-  const { data, error } = await supabase
-    .from("products")
-    .select("id, name, price, image, category")
-    /* Порядок как в старом каталоге: по пути картинки (_01, _02, …), затем по id. */
-    .order("image", { ascending: true })
-    .order("id", { ascending: true });
-
-  if (error) return { data: [], error: error.message };
-  const rows = (data ?? []) as Record<string, unknown>[];
-  return { data: rows.map(rowFromDb), error: null };
+  return loadCatalogProductRows(supabase);
 }
 
 /** @deprecated имя сохранено для совместимости; используйте `fetchAllProducts`. */
@@ -68,16 +37,7 @@ export async function fetchRecentProductsFromDb(limit: number): Promise<{
         "Supabase не настроен для сервера: задайте NEXT_PUBLIC_SUPABASE_URL и SUPABASE_SERVICE_ROLE_KEY.",
     };
   }
-
-  const { data, error } = await supabase
-    .from("products")
-    .select("id, name, price, image, category")
-    .order("id", { ascending: false })
-    .limit(limit);
-
-  if (error) return { data: [], error: error.message };
-  const rows = (data ?? []) as Record<string, unknown>[];
-  return { data: rows.map(rowFromDb), error: null };
+  return loadRecentProductRows(supabase, limit);
 }
 
 export async function insertProductRow(input: {

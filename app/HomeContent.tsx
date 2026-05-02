@@ -1,24 +1,37 @@
 "use client";
 
-import { Suspense, useCallback, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { Hero } from "@/components/layout/Hero";
 import { CategoryPills } from "@/components/catalog/CategoryPills";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
 import type { CatalogPillFilter } from "@/lib/catalogPillFilter";
 import { products as fallbackProducts, type Material, type Product } from "@/lib/products";
-import type { HomeCatalogPayload } from "@/lib/catalogProductMapper";
+import { loadCatalogProductRows } from "@/lib/catalogProductQuery";
+import { productRowsToUiProducts } from "@/lib/catalogProductMapper";
+import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 import { useCart } from "@/lib/cart";
 
-export function HomeContent({ catalogPayload }: { catalogPayload: HomeCatalogPayload }) {
+export function HomeContent() {
   const { addItem } = useCart();
   const [pillFilter, setPillFilter] = useState<CatalogPillFilter>("all");
   const [selectedCategory, setSelectedCategory] = useState<Material | null>(null);
+  const [products, setProducts] = useState<Product[]>(fallbackProducts);
 
-  const [products] = useState<Product[]>(() =>
-    catalogPayload.ok ? catalogPayload.products : fallbackProducts
-  );
-
-  const productsError = catalogPayload.ok ? null : catalogPayload.message;
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      const supabase = getSupabaseBrowserClient();
+      if (!supabase) return;
+      const { data, error } = await loadCatalogProductRows(supabase);
+      if (cancelled) return;
+      if (error || !data.length) return;
+      setProducts(productRowsToUiProducts(data));
+    };
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSelectPill = useCallback((pill: CatalogPillFilter) => {
     setPillFilter(pill);
@@ -32,11 +45,6 @@ export function HomeContent({ catalogPayload }: { catalogPayload: HomeCatalogPay
           <CategoryPills selected={pillFilter} onSelect={handleSelectPill} />
         }
       />
-      {productsError && (
-        <div className="mx-auto w-full max-w-screen-xl px-4 text-sm text-red-600 sm:px-6 lg:px-8">
-          {productsError}
-        </div>
-      )}
       <Suspense fallback={<div></div>}>
         <ProductGrid
           allProducts={products}
