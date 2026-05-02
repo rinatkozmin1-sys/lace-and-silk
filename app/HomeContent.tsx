@@ -67,7 +67,7 @@ export function HomeContent() {
     const loadProducts = async () => {
       setIsLoadingProducts(true);
       try {
-        const res = await fetch("/api/products", { cache: "no-store" });
+        const res = await fetch(`/api/products?t=${Date.now()}`, { cache: "no-store" });
         const json = (await res.json()) as { products?: ProductApiRow[]; error?: string };
         if (!active) return;
         if (!res.ok || !json.products) {
