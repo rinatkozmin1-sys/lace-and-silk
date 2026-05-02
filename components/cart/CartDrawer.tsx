@@ -1,10 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { useCart, type CartItem as CartLine } from "@/lib/cart";
 import { Drawer } from "@/components/ui/Drawer";
 import { CartItem } from "./CartItem";
-import Link from "next/link";
+import { OverlayCheckout } from "./OverlayCheckout";
 import { KaspiPaymentWidget } from "@/components/payment/KaspiPaymentWidget";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
@@ -15,6 +16,7 @@ import type { FxRates } from "@/lib/fx";
 import { useFxCurrency, type FxCurrency } from "@/lib/fxCurrency";
 import { useFxRates } from "@/lib/useFxRates";
 import { useI18n, type Lang } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 function buildOrderMessage(
   items: CartLine[],
@@ -38,6 +40,8 @@ export function CartDrawer() {
   const { t, lang } = useI18n();
   const { currency } = useFxCurrency();
   const { rates } = useFxRates();
+  const [isCheckoutVisible, setIsCheckoutVisible] = useState(false);
+
   const {
     items,
     totalPrice,
@@ -47,6 +51,16 @@ export function CartDrawer() {
     decrement,
     removeItem,
   } = useCart();
+
+  useEffect(() => {
+    if (!isOpen) setIsCheckoutVisible(false);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (items.length === 0) setIsCheckoutVisible(false);
+  }, [items.length]);
+
+  const closeCheckout = () => setIsCheckoutVisible(false);
 
   const openOrderLink = (baseUrl: string) => {
     const message = buildOrderMessage(items, totalPrice, lang, currency, rates);
@@ -70,64 +84,94 @@ export function CartDrawer() {
           </IconButton>
         </div>
       </div>
+
       <div className="relative z-0 flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="flex-1 overflow-y-auto px-4">
-          {items.length === 0 ? (
-            <p className="py-12 text-center text-primary/70">
-              {t("cart.empty")}
-            </p>
-          ) : (
-            <ul className="py-4">
-              {items.map((item) => (
-                <li key={item.product.id}>
-                  <CartItem
-                    item={item}
-                    onIncrement={() => increment(item.product.id)}
-                    onDecrement={() => decrement(item.product.id)}
-                    onRemove={() => removeItem(item.product.id)}
-                  />
-                </li>
-              ))}
-            </ul>
+        <div
+          role="presentation"
+          className={cn(
+            "absolute inset-0 z-[38] bg-primary/45 transition-opacity duration-300 ease-out",
+            isCheckoutVisible ? "opacity-100" : "pointer-events-none opacity-0"
+          )}
+          onClick={closeCheckout}
+          aria-hidden={!isCheckoutVisible}
+        />
+
+        <div
+          className={cn(
+            "relative z-0 flex min-h-0 flex-1 flex-col transition-opacity duration-300 ease-out",
+            isCheckoutVisible && "pointer-events-none opacity-[0.38]"
+          )}
+        >
+          <div className="flex-1 overflow-y-auto px-4">
+            {items.length === 0 ? (
+              <p className="py-12 text-center text-primary/70">{t("cart.empty")}</p>
+            ) : (
+              <ul className="py-4">
+                {items.map((item) => (
+                  <li key={item.product.id}>
+                    <CartItem
+                      item={item}
+                      onIncrement={() => increment(item.product.id)}
+                      onDecrement={() => decrement(item.product.id)}
+                      onRemove={() => removeItem(item.product.id)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {items.length > 0 && (
+            <div className="relative z-10 shrink-0 border-t border-primary/10 bg-body p-4">
+              <div className="flex items-center justify-between text-lg font-medium">
+                <span>{t("cart.total")}</span>
+                <PriceFx amountKzt={totalPrice} className="text-lg font-medium" />
+              </div>
+
+              <div className="mt-4">
+                <KaspiPaymentWidget variant="compact" />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsCheckoutVisible(true)}
+                className="mt-4 flex w-full items-center justify-center rounded-xl border border-primary/15 bg-white py-3 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:border-accent/35 hover:bg-accent/5"
+              >
+                {t("checkout.placeOrder")}
+              </button>
+
+              <div className="mt-4 flex w-full flex-col gap-3">
+                <Button
+                  className="w-full bg-[#25D366] py-3 text-base text-white transition-colors hover:bg-[#20b858]"
+                  onClick={() => openOrderLink("https://wa.me/77054161614?text=")}
+                >
+                  {t("cart.orderWhatsapp")}
+                </Button>
+
+                <Button
+                  className="w-full bg-[#0088cc] py-3 text-base text-white transition-colors hover:bg-[#0077b3]"
+                  onClick={() => openOrderLink("https://t.me/Шарфики_Косынки?text=")}
+                >
+                  {t("cart.orderTelegram")}
+                </Button>
+              </div>
+            </div>
           )}
         </div>
+
+        <OverlayCheckout
+          open={isCheckoutVisible}
+          onBackToCart={closeCheckout}
+          onCloseCart={() => {
+            closeCheckout();
+            closeCart();
+          }}
+          onBeforeNavigateHome={() => {
+            closeCheckout();
+            closeCart();
+          }}
+        />
       </div>
-      {items.length > 0 && (
-        <div className="relative z-10 shrink-0 border-t border-primary/10 bg-body p-4">
-          <div className="flex items-center justify-between text-lg font-medium">
-            <span>{t("cart.total")}</span>
-            <PriceFx amountKzt={totalPrice} className="text-lg font-medium" />
-          </div>
-
-          <div className="mt-4">
-            <KaspiPaymentWidget variant="compact" />
-          </div>
-
-          <Link
-            href="/checkout"
-            onClick={() => closeCart()}
-            className="mt-4 flex w-full items-center justify-center rounded-xl border border-primary/15 bg-white py-3 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:border-accent/35 hover:bg-accent/5"
-          >
-            Перейти к оформлению
-          </Link>
-
-          <div className="mt-4 flex w-full flex-col gap-3">
-            <Button
-              className="w-full bg-[#25D366] py-3 text-base text-white transition-colors hover:bg-[#20b858]"
-              onClick={() => openOrderLink("https://wa.me/77054161614?text=")}
-            >
-              {t("cart.orderWhatsapp")}
-            </Button>
-
-            <Button
-              className="w-full bg-[#0088cc] py-3 text-base text-white transition-colors hover:bg-[#0077b3]"
-              onClick={() => openOrderLink("https://t.me/Шарфики_Косынки?text=")}
-            >
-              {t("cart.orderTelegram")}
-            </Button>
-          </div>
-        </div>
-      )}
     </Drawer>
   );
 }

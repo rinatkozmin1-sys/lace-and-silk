@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { Minus, Plus, X } from "lucide-react";
 import type { CartItem as CartItemType } from "@/lib/cart";
 import { IconButton } from "@/components/ui/IconButton";
 import { PriceFx } from "@/components/ui/PriceFx";
+import { ImageModal } from "@/components/ui/ImageModal";
 import { useI18n } from "@/lib/i18n";
 
 export function CartItem({
@@ -22,19 +24,32 @@ export function CartItem({
   const { product, quantity } = item;
   const lineTotal = product.price * quantity;
   const name = product.name[lang] ?? product.name.ru;
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   return (
     <div className="flex gap-4 border-b border-primary/10 py-4">
-      <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg bg-primary/5">
+      <button
+        type="button"
+        onClick={() => setLightboxOpen(true)}
+        aria-label={t("cart.enlargeImage")}
+        className="group relative h-20 w-16 shrink-0 overflow-hidden rounded-lg bg-primary/5 text-left shadow-sm ring-1 ring-black/[0.04] transition-shadow duration-300 ease-out hover:shadow-md hover:ring-primary/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+      >
         <Image
           src={product.image}
-          alt={name}
+          alt=""
           fill
           unoptimized
           sizes="64px"
-          className="object-cover"
+          className="object-cover transition duration-300 ease-out group-hover:scale-105 group-hover:opacity-90"
+          aria-hidden
         />
-      </div>
+      </button>
+      <ImageModal
+        open={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        src={product.image}
+        alt={name}
+      />
       <div className="min-w-0 flex-1">
         <h3 className="font-product text-xl font-medium leading-tight text-primary md:text-2xl">
           {name}
