@@ -31,6 +31,10 @@ const supabasePattern = supabaseStorageRemotePattern();
 if (supabasePattern) remotePatterns.push(supabasePattern);
 
 const nextConfig = {
+  experimental: {
+    /** Восстановление скролла при клиентских переходах (App Router) */
+    scrollRestoration: true,
+  },
   images: {
     remotePatterns,
   },

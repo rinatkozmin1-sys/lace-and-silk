@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { ChevronUp } from "lucide-react";
@@ -20,6 +20,11 @@ import {
   type Product,
 } from "@/lib/products";
 import { Button } from "@/components/ui/Button";
+import {
+  applyCatalogScrollY,
+  stashCatalogScrollY,
+  takeStashedCatalogScrollY,
+} from "@/lib/catalogScrollRestore";
 
 const PILL_T_KEYS: Record<Exclude<CatalogPillFilter, "all">, string> = {
   kosynki: "hero.pillKosynki",
@@ -65,6 +70,8 @@ export function ProductGrid({
   const [isCatalogScrolled, setIsCatalogScrolled] = useState(false);
   const [isViewTransitioning, setIsViewTransitioning] = useState(false);
   const [showScrollTopButton, setShowScrollTopButton] = useState(false);
+  /** Позиция скролла до открытия оверлея фото (та же вкладка + sessionStorage в stash) */
+  const scrollBeforeLightboxRef = useRef<number | null>(null);
 
   const searchQuery = searchParams.get("search")?.trim() ?? "";
   const normalizedSearch = searchQuery.toLocaleLowerCase();
@@ -204,11 +211,26 @@ export function ProductGrid({
     window.setTimeout(() => {
       setSelectedImage(null);
       setIsClosingImage(false);
+      const fromRef = scrollBeforeLightboxRef.current;
+      scrollBeforeLightboxRef.current = null;
+      let y: number | null = null;
+      if (fromRef !== null) {
+        takeStashedCatalogScrollY();
+        y = fromRef;
+      } else {
+        y = takeStashedCatalogScrollY();
+      }
+      if (y !== null) {
+        requestAnimationFrame(() => applyCatalogScrollY(y));
+      }
     }, 520);
   };
 
   const openSelectedImage = (url: string | null) => {
     if (!url) return;
+    const y = window.scrollY;
+    scrollBeforeLightboxRef.current = y;
+    stashCatalogScrollY();
     setIsClosingImage(false);
     setIsOpeningImage(true);
     setSelectedImage(url);

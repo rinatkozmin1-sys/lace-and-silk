@@ -10,6 +10,7 @@ import { loadCatalogProductRows } from "@/lib/catalogProductQuery";
 import { productRowsToUiProducts } from "@/lib/catalogProductMapper";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 import { useCart } from "@/lib/cart";
+import { applyCatalogScrollY } from "@/lib/catalogScrollRestore";
 
 export function HomeContent() {
   const { addItem } = useCart();
@@ -25,7 +26,11 @@ export function HomeContent() {
       const { data, error } = await loadCatalogProductRows(supabase);
       if (cancelled) return;
       if (error || !data.length) return;
+      const scrollY = window.scrollY;
       setProducts(productRowsToUiProducts(data));
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => applyCatalogScrollY(scrollY));
+      });
     };
     void run();
     return () => {
