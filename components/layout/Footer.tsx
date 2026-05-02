@@ -48,9 +48,11 @@ export function Footer() {
             <div className="mt-4 space-y-4 text-sm text-primary/70">
               <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-primary/10 transition-all hover:bg-white hover:shadow-sm">
                 <div className="flex items-center gap-2">
-                  <img
+                  <Image
                     src="/kaspi.jpg"
                     alt="Kaspi"
+                    width={72}
+                    height={24}
                     className="h-6 w-auto object-contain"
                   />
                   <span className="text-base font-medium text-primary">Kaspi Pay</span>

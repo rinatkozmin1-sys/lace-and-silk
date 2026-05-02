@@ -4,6 +4,8 @@ import { X } from "lucide-react";
 import { useCart, type CartItem as CartLine } from "@/lib/cart";
 import { Drawer } from "@/components/ui/Drawer";
 import { CartItem } from "./CartItem";
+import Link from "next/link";
+import { KaspiPaymentWidget } from "@/components/payment/KaspiPaymentWidget";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { PriceFx } from "@/components/ui/PriceFx";
@@ -96,6 +98,18 @@ export function CartDrawer() {
             <span>{t("cart.total")}</span>
             <PriceFx amountKzt={totalPrice} className="text-lg font-medium" />
           </div>
+
+          <div className="mt-4">
+            <KaspiPaymentWidget variant="compact" />
+          </div>
+
+          <Link
+            href="/checkout"
+            onClick={() => closeCart()}
+            className="mt-4 flex w-full items-center justify-center rounded-xl border border-primary/15 bg-white py-3 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:border-accent/35 hover:bg-accent/5"
+          >
+            Перейти к оформлению
+          </Link>
 
           <div className="mt-4 flex w-full flex-col gap-3">
             <Button
