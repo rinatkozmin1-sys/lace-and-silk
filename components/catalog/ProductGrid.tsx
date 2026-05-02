@@ -342,7 +342,7 @@ export function ProductGrid({
           type="button"
           onClick={scrollCatalogToTopSmooth}
           aria-label="Наверх"
-          className="fixed bottom-5 right-5 z-50 inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-gray-200 text-gray-700 shadow-md transition-all duration-300 hover:bg-gray-300 hover:shadow-lg"
+          className="fixed bottom-28 right-5 z-50 inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-gray-200 text-gray-700 shadow-md transition-all duration-300 hover:bg-gray-300 hover:shadow-lg"
         >
           <ChevronUp className="h-5 w-5" />
         </button>
