@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { migrateLegacyProductsToSupabase } from "@/lib/migrateLegacyProducts";
 
 export const dynamic = "force-dynamic";
@@ -7,24 +7,22 @@ export const dynamic = "force-dynamic";
  * Временная миграция: перенос жёстко заданного каталога из `lib/products.ts` (`products`)
  * в таблицу `public.products` через service role.
  *
- * Защита: заголовок `x-migrate-secret` должен совпадать с `MIGRATE_LEGACY_PRODUCTS_SECRET` в env.
+ * Защита: query `secret` должен совпадать с `MIGRATE_LEGACY_PRODUCTS_SECRET` в env.
  *
- * Вызов (локально или на деплое):
- *   curl -X POST "https://<host>/api/dev/migrate-legacy-products" \
- *     -H "Content-Type: application/json" \
- *     -H "x-migrate-secret: <секрет>" \
- *     -d "{\"replaceAll\":false}"
+ * Пример в браузере:
+ *   /api/dev/migrate-legacy-products?secret=<секрет>&replaceAll=false
  *
- * `replaceAll: true` — сначала удаляет ВСЕ строки из `products`, затем вставляет наследие.
+ * `replaceAll=true` — сначала удаляет ВСЕ строки из `products`, затем вставляет наследие.
  * Без этого повторный запуск добавит дубликаты.
  *
- * Картинки: пока сохраняются как в коде (`/…jpg` или абсолютные URL). Массовый перенос в Storage — см.
- * комментарий в `lib/migrateLegacyProducts.ts`.
+ * Важно: секрет в URL попадает в логи прокси/сервера — после миграции удалите роут и секрет.
+ *
+ * Картинки: пока как в коде (`/…jpg` или URL). Массовый перенос в Storage — см. `lib/migrateLegacyProducts.ts`.
  */
 
-export async function GET(req: Request) {
-  const secret = process.env.MIGRATE_LEGACY_PRODUCTS_SECRET;
-  if (!secret) {
+export async function GET(request: NextRequest) {
+  const expected = process.env.MIGRATE_LEGACY_PRODUCTS_SECRET;
+  if (!expected) {
     return NextResponse.json(
       {
         ok: false,
@@ -35,20 +33,16 @@ export async function GET(req: Request) {
     );
   }
 
-  const headerSecret = req.headers.get("x-migrate-secret");
-  if (headerSecret !== secret) {
-    return NextResponse.json({ ok: false, error: "Неверный или отсутствующий x-migrate-secret" }, { status: 401 });
+  const secret = request.nextUrl.searchParams.get("secret");
+  if (secret !== expected) {
+    return NextResponse.json(
+      { ok: false, error: "Неверный или отсутствующий параметр secret в URL" },
+      { status: 401 }
+    );
   }
 
-  let body: { replaceAll?: boolean } = {};
-  try {
-    const raw = await req.text();
-    if (raw.trim()) body = JSON.parse(raw) as { replaceAll?: boolean };
-  } catch {
-    return NextResponse.json({ ok: false, error: "Некорректный JSON тела запроса" }, { status: 400 });
-  }
-
-  const replaceAll = Boolean(body.replaceAll);
+  const replaceAllParam = request.nextUrl.searchParams.get("replaceAll");
+  const replaceAll = replaceAllParam === "true" || replaceAllParam === "1";
 
   try {
     const { inserted } = await migrateLegacyProductsToSupabase({ replaceAll });
