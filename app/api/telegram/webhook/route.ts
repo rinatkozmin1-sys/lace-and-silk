@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getPublicShopUrl } from "@/lib/siteUrl";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { uploadProductImageBuffer } from "@/lib/supabaseProductImage";
 import {
@@ -73,12 +74,28 @@ async function sendPlainMessage(chatId: number, text: string) {
   });
 }
 
-/** Две кнопки панели из команды /admin */
+/** Панель /admin + актуальный URL магазина (Vercel), без старых Netlify-ссылок */
 function adminKeyboard() {
+  const shopUrl = getPublicShopUrl();
   return {
     inline_keyboard: [
       [{ text: "Добавить новый товар", callback_data: "admin_help_add" }],
       [{ text: "Удалить товар", callback_data: "admin_delete_list" }],
+      [
+        { text: "🛍 Открыть магазин", web_app: { url: shopUrl } },
+        { text: "Браузер", url: shopUrl },
+      ],
+    ],
+  };
+}
+
+/** Кнопки каталога для всех пользователей (/start) */
+function shopEntryKeyboard() {
+  const shopUrl = getPublicShopUrl();
+  return {
+    inline_keyboard: [
+      [{ text: "🛍 Открыть магазин (Mini App)", web_app: { url: shopUrl } }],
+      [{ text: "Открыть сайт в браузере", url: shopUrl }],
     ],
   };
 }
@@ -141,7 +158,13 @@ async function handleMessage(update: { message?: Record<string, unknown> }) {
   const text: string = typeof message.text === "string" ? message.text : "";
 
   if (text.startsWith("/start")) {
-    await sendPlainMessage(chatId, "Бот работает, жду команду /admin или фото товара.");
+    await tgApi("sendMessage", {
+      chat_id: chatId,
+      text:
+        "Бот работает. Жду команду /admin или фото товара.\n\n" +
+        "Каталог магазина открывается кнопкой ниже (актуальный адрес сайта).",
+      reply_markup: shopEntryKeyboard(),
+    });
     return;
   }
 
