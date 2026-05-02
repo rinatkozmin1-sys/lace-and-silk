@@ -16,7 +16,7 @@ SUPABASE_SERVICE_ROLE_KEY=...
 
 **Service role** нужен только серверу (Route Handlers): загрузка в Storage, вставка и удаление строк в `products`. На клиент и в репозиторий ключ не выкладывайте.
 
-Сайт получает каталог через `GET /api/products` — запрос к Supabase выполняется на сервере с тем же service role.
+Главная страница читает каталог на сервере через `fetchAllProducts()` (Supabase SDK, service role). Маршрут `GET /api/products` остаётся для внешних клиентов при необходимости.
 
 Для `next/image` хост Storage подставляется из `NEXT_PUBLIC_SUPABASE_URL` при сборке (`next.config.mjs`).
 
@@ -58,4 +58,4 @@ TELEGRAM_BOT_TOKEN=ваш_токен_бота
 
 ## 6) Откуда сайт читает товары
 
-Через `GET /api/products` из таблицы Supabase `products`. Поле `image` — публичный URL из Storage. Файл `data/products.json` для этого потока не используется.
+Каталог в БД — таблица `products`, поле `image` — публичный URL из Storage. Файл `data/products.json` не используется.

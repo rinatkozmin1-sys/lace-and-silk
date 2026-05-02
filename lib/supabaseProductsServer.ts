@@ -24,7 +24,11 @@ function rowFromDb(row: Record<string, unknown>): ProductRow {
   };
 }
 
-export async function fetchAllProductsFromDb(): Promise<{
+/**
+ * Все товары каталога из Supabase. Только SDK (`supabase.from`), без `fetch` к своему API —
+ * иначе на Vercel в RSC возможна ошибка вида «Invalid path specified in request URL».
+ */
+export async function fetchAllProducts(): Promise<{
   data: ProductRow[];
   error: string | null;
 }> {
@@ -48,6 +52,9 @@ export async function fetchAllProductsFromDb(): Promise<{
   const rows = (data ?? []) as Record<string, unknown>[];
   return { data: rows.map(rowFromDb), error: null };
 }
+
+/** @deprecated имя сохранено для совместимости; используйте `fetchAllProducts`. */
+export const fetchAllProductsFromDb = fetchAllProducts;
 
 export async function fetchRecentProductsFromDb(limit: number): Promise<{
   data: ProductRow[];

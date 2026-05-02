@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchAllProductsFromDb } from "@/lib/supabaseProductsServer";
+import { fetchAllProducts } from "@/lib/supabaseProductsServer";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -9,7 +9,7 @@ const NO_STORE_HEADERS = {
 };
 
 export async function GET() {
-  const { data: products, error } = await fetchAllProductsFromDb();
+  const { data: products, error } = await fetchAllProducts();
   if (error) {
     return NextResponse.json(
       { error, products: [] },
