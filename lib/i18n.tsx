@@ -160,6 +160,30 @@ export const dictionary = {
     },
     sum: { ru: "Сумма", en: "Subtotal", de: "Zwischensumme", kk: "Сома", uk: "Сума", uz: "Jami" },
   },
+  checkout: {
+    back: { ru: "← Назад", en: "← Back", de: "← Zurück", kk: "← Артқа", uk: "← Назад", uz: "← Orqaga" },
+    openCart: { ru: "В корзину", en: "Cart", de: "Zum Warenkorb", kk: "Себетке", uk: "До кошика", uz: "Savatga" },
+    home: { ru: "На главную", en: "Home", de: "Startseite", kk: "Басты бетке", uk: "На головну", uz: "Bosh sahifa" },
+    close: { ru: "Закрыть", en: "Close", de: "Schließen", kk: "Жабу", uk: "Закрити", uz: "Yopish" },
+    yourOrder: { ru: "Ваш заказ", en: "Your order", de: "Ihre Bestellung", kk: "Сіздің тапсырысыңыз", uk: "Ваше замовлення", uz: "Buyurtmangiz" },
+    emptyOrder: {
+      ru: "В заказе пока нет товаров — добавьте их из каталога.",
+      en: "Your order is empty — add items from the catalog.",
+      de: "Keine Artikel — bitte aus dem Katalog hinzufügen.",
+      kk: "Тапсырыста тауар жоқ — каталогтан қосыңыз.",
+      uk: "У замовленні ще нічого немає — додайте товари з каталогу.",
+      uz: "Buyurtmada mahsulot yo‘q — katalogdan qo‘shing.",
+    },
+    browseCatalog: { ru: "В каталог", en: "Browse catalog", de: "Zum Katalog", kk: "Каталогқа", uk: "До каталогу", uz: "Katalogga" },
+    paymentHeading: {
+      ru: "Оплата",
+      en: "Payment",
+      de: "Zahlung",
+      kk: "Төлем",
+      uk: "Оплата",
+      uz: "To‘lov",
+    },
+  },
   footer: {
     social: {
       ru: "Соцсети",
