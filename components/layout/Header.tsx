@@ -32,7 +32,7 @@ export function Header() {
     }
 
     const queryString = params.toString();
-    router.push(queryString ? `${pathname}?${queryString}` : pathname);
+    router.push(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false });
   };
 
   useEffect(() => {
@@ -62,6 +62,7 @@ export function Header() {
           <div className="flex justify-center md:justify-start">
             <Link
               href="/"
+              scroll={false}
               className="truncate text-center font-serif text-2xl font-medium text-primary sm:text-3xl md:text-2xl"
             >
               Hristianskyi style

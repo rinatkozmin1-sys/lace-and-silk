@@ -39,6 +39,11 @@ export function HomeContent() {
   }, []);
 
   const handleSelectPill = useCallback((pill: CatalogPillFilter) => {
+    try {
+      sessionStorage.removeItem("catalogScroll");
+    } catch {
+      /* ignore */
+    }
     setPillFilter(pill);
     setSelectedCategory(null);
   }, []);

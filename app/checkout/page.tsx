@@ -13,7 +13,7 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-body pb-16 pt-8 sm:pb-20 sm:pt-12">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <nav className="text-sm text-primary/55">
-          <Link href="/" className="transition-colors hover:text-primary">
+          <Link href="/" scroll={false} className="transition-colors hover:text-primary">
             Главная
           </Link>
           <span className="mx-2 text-primary/35">/</span>

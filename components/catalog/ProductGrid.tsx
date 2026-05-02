@@ -26,6 +26,9 @@ import {
   takeStashedCatalogScrollY,
 } from "@/lib/catalogScrollRestore";
 
+/** Скролл страницы на сетке «видов» перед входом в категорию — восстановление после «Назад к видам» */
+const CATALOG_SCROLL_SESSION_KEY = "catalogScroll";
+
 const PILL_T_KEYS: Record<Exclude<CatalogPillFilter, "all">, string> = {
   kosynki: "hero.pillKosynki",
   sharfy: "hero.pillSharfy",
@@ -70,8 +73,6 @@ export function ProductGrid({
   const [isCatalogScrolled, setIsCatalogScrolled] = useState(false);
   const [isViewTransitioning, setIsViewTransitioning] = useState(false);
   const [showScrollTopButton, setShowScrollTopButton] = useState(false);
-  /** Позиция скролла до открытия оверлея фото (та же вкладка + sessionStorage в stash) */
-  const scrollBeforeLightboxRef = useRef<number | null>(null);
 
   const searchQuery = searchParams.get("search")?.trim() ?? "";
   const normalizedSearch = searchQuery.toLocaleLowerCase();
@@ -119,6 +120,11 @@ export function ProductGrid({
     !isSearching &&
     selectedCategory === null &&
     typeCards.length > 0;
+
+  /** Позиция скролла до открытия оверлея фото (та же вкладка + sessionStorage в stash) */
+  const scrollBeforeLightboxRef = useRef<number | null>(null);
+  /** Был ли предыдущий рендер без сетки видов — чтобы восстановить скролл только после возврата из категории */
+  const prevShowLevel1TypesRef = useRef(showLevel1Types);
 
   const catalogHeading = useMemo(() => {
     if (showLevel1Types) return null;
@@ -184,6 +190,65 @@ export function ProductGrid({
   }, []);
 
   useEffect(() => {
+    try {
+      sessionStorage.removeItem(CATALOG_SCROLL_SESSION_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (!showLevel1Types) {
+      prevShowLevel1TypesRef.current = false;
+      return;
+    }
+
+    let cancelled = false;
+    const raw = sessionStorage.getItem(CATALOG_SCROLL_SESSION_KEY);
+    if (raw === null) {
+      prevShowLevel1TypesRef.current = true;
+      return;
+    }
+
+    const cameFromCategoryGrid = prevShowLevel1TypesRef.current === false;
+    prevShowLevel1TypesRef.current = true;
+
+    if (!cameFromCategoryGrid) {
+      try {
+        sessionStorage.removeItem(CATALOG_SCROLL_SESSION_KEY);
+      } catch {
+        /* ignore */
+      }
+      return;
+    }
+
+    const y = parseInt(raw, 10);
+    if (Number.isNaN(y)) {
+      try {
+        sessionStorage.removeItem(CATALOG_SCROLL_SESSION_KEY);
+      } catch {
+        /* ignore */
+      }
+      return;
+    }
+
+    const id = window.setTimeout(() => {
+      if (cancelled) return;
+      window.scrollTo(0, y);
+      try {
+        sessionStorage.removeItem(CATALOG_SCROLL_SESSION_KEY);
+      } catch {
+        /* ignore */
+      }
+    }, 80);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(id);
+    };
+  }, [showLevel1Types, typeCards.length, allProducts.length]);
+
+  useEffect(() => {
     if (!selectedCategory || pillFilter !== "all") return;
 
     const scrollCatalogToTopInstant = () => {
@@ -241,6 +306,13 @@ export function ProductGrid({
 
   const switchCatalogView = (nextCategory: Material | null) => {
     if (isViewTransitioning) return;
+    if (nextCategory !== null) {
+      try {
+        sessionStorage.setItem(CATALOG_SCROLL_SESSION_KEY, String(window.scrollY));
+      } catch {
+        /* ignore */
+      }
+    }
     setIsViewTransitioning(true);
     window.setTimeout(() => {
       if (nextCategory === null) {
