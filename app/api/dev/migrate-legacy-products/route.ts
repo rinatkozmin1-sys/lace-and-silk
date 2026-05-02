@@ -22,7 +22,7 @@ export const dynamic = "force-dynamic";
  * комментарий в `lib/migrateLegacyProducts.ts`.
  */
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   const secret = process.env.MIGRATE_LEGACY_PRODUCTS_SECRET;
   if (!secret) {
     return NextResponse.json(
