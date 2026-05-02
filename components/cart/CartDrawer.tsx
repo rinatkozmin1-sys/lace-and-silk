@@ -102,11 +102,11 @@ export function CartDrawer() {
             isCheckoutVisible && "pointer-events-none opacity-[0.38]"
           )}
         >
-          <div className="flex-1 overflow-y-auto px-4">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4">
             {items.length === 0 ? (
               <p className="py-12 text-center text-primary/70">{t("cart.empty")}</p>
             ) : (
-              <ul className="py-4">
+              <ul className="py-4 pb-6">
                 {items.map((item) => (
                   <li key={item.product.id}>
                     <CartItem
@@ -122,8 +122,17 @@ export function CartDrawer() {
           </div>
 
           {items.length > 0 && (
-            <div className="relative z-10 shrink-0 border-t border-primary/10 bg-body p-4">
-              <div className="flex items-center justify-between text-lg font-medium">
+            <div
+              className={cn(
+                "relative z-10 shrink-0 rounded-t-3xl bg-white px-4 pb-5 pt-3",
+                "shadow-[0_-4px_10px_-2px_rgba(0,0,0,0.05)] ring-1 ring-black/[0.04]"
+              )}
+            >
+              <div
+                className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-gray-300/60"
+                aria-hidden
+              />
+              <div className="flex items-center justify-between text-lg font-medium text-primary">
                 <span>{t("cart.total")}</span>
                 <PriceFx amountKzt={totalPrice} className="text-lg font-medium" />
               </div>
