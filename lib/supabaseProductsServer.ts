@@ -40,6 +40,8 @@ export async function fetchAllProductsFromDb(): Promise<{
   const { data, error } = await supabase
     .from("products")
     .select("id, name, price, image, category")
+    /* Порядок как в старом каталоге: по пути картинки (_01, _02, …), затем по id. */
+    .order("image", { ascending: true })
     .order("id", { ascending: true });
 
   if (error) return { data: [], error: error.message };
