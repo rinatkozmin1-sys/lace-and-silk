@@ -68,6 +68,10 @@ export default function RootLayout({
         <TelegramMiniAppExpand />
         <IntroScreen />
         <AppShell>{children}</AppShell>
+        <Script
+          src="https://code.jivo.ru/widget/w1bRqjEKZI"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );
