@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
-/** Файл лежит в `public/icon.png`; в манифесте — только абсолютный URL для клиентов вроде Telegram. */
-const ICON_ABSOLUTE = "https://lace-and-silk.vercel.app/icon.png";
+/** Файл: `public/icon-v2.png`; абсолютный URL + ?v= для сброса кэша клиента (Telegram). */
+const ICON_ABSOLUTE = "https://lace-and-silk.vercel.app/icon-v2.png?v=2";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {

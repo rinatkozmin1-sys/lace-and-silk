@@ -32,9 +32,9 @@ export const viewport: Viewport = {
   themeColor: THEME_COLOR,
 };
 
-/** Прод-домен магазина и иконка — только абсолютные URL (Telegram / PWA). */
+/** Прод-домен магазина и иконка — абсолютные URL + query для сброса кэша Telegram. */
 const SITE_ORIGIN = "https://lace-and-silk.vercel.app";
-const ICON_ABSOLUTE = `${SITE_ORIGIN}/icon.png`;
+const ICON_ABSOLUTE = `${SITE_ORIGIN}/icon-v2.png?v=2`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_ORIGIN),
