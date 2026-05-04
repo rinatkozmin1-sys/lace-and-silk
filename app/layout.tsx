@@ -35,7 +35,6 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Lace & Silk — Косынки и шарфы",
   description: "Эксклюзивные косынки и шарфы из натуральных тканей",
-  manifest: "/manifest.json",
   icons: {
     icon: [{ url: "/icon.png", type: "image/png" }],
     shortcut: "/icon.png",

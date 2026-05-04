@@ -7,6 +7,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/lib/cart";
 import { Container } from "./Container";
 import { CurrencySwitcher } from "./CurrencySwitcher";
+import { TelegramAddToHomeButton } from "@/components/TelegramAddToHomeButton";
 import { IconButton } from "@/components/ui/IconButton";
 import { cn } from "@/lib/utils";
 import { useI18n, type Lang } from "@/lib/i18n";
@@ -85,6 +86,7 @@ export function Header() {
                 </option>
               ))}
             </select>
+            <TelegramAddToHomeButton />
             <button
               type="button"
               onClick={openCart}
