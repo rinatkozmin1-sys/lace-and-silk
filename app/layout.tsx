@@ -4,7 +4,6 @@ import { Marck_Script, Playfair_Display, Source_Sans_3 } from "next/font/google"
 import { AppShell } from "@/components/layout/AppShell";
 import { IntroScreen } from "@/components/IntroScreen";
 import { TelegramMiniAppExpand } from "@/components/TelegramMiniAppExpand";
-import { getPublicShopUrl } from "@/lib/siteUrl";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -33,24 +32,25 @@ export const viewport: Viewport = {
   themeColor: THEME_COLOR,
 };
 
-/** Абсолютные URL иконок (Safari / «На экран» иногда надёжнее берут полный путь). */
-const ICON = "/icon.png";
+/** Прод-домен магазина и иконка — только абсолютные URL (Telegram / PWA). */
+const SITE_ORIGIN = "https://lace-and-silk.vercel.app";
+const ICON_ABSOLUTE = `${SITE_ORIGIN}/icon.png`;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(getPublicShopUrl()),
+  metadataBase: new URL(SITE_ORIGIN),
   title: "Lace & Silk — Косынки и шарфы",
   description: "Эксклюзивные косынки и шарфы из натуральных тканей",
   icons: {
     icon: [
-      { url: ICON, sizes: "32x32", type: "image/png" },
-      { url: ICON, sizes: "192x192", type: "image/png" },
-      { url: ICON, sizes: "512x512", type: "image/png" },
+      { url: ICON_ABSOLUTE, sizes: "32x32", type: "image/png" },
+      { url: ICON_ABSOLUTE, sizes: "192x192", type: "image/png" },
+      { url: ICON_ABSOLUTE, sizes: "512x512", type: "image/png" },
     ],
-    shortcut: [{ url: ICON, type: "image/png" }],
+    shortcut: [{ url: ICON_ABSOLUTE, type: "image/png" }],
     apple: [
-      { url: ICON, sizes: "180x180", type: "image/png" },
-      { url: ICON, sizes: "152x152", type: "image/png" },
-      { url: ICON, sizes: "167x167", type: "image/png" },
+      { url: ICON_ABSOLUTE, sizes: "180x180", type: "image/png" },
+      { url: ICON_ABSOLUTE, sizes: "152x152", type: "image/png" },
+      { url: ICON_ABSOLUTE, sizes: "167x167", type: "image/png" },
     ],
   },
   appleWebApp: {

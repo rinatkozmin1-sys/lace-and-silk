@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
-/** PWA / «Добавить на экран»: иконки — `public/icon.png` (используйте квадрат ≥512 px для лучшего качества). */
-const ICON = "/icon.png";
+/** Файл лежит в `public/icon.png`; в манифесте — только абсолютный URL для клиентов вроде Telegram. */
+const ICON_ABSOLUTE = "https://lace-and-silk.vercel.app/icon.png";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -16,19 +16,19 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#F4E8F6",
     icons: [
       {
-        src: ICON,
+        src: ICON_ABSOLUTE,
         sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: ICON,
+        src: ICON_ABSOLUTE,
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: ICON,
+        src: ICON_ABSOLUTE,
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
