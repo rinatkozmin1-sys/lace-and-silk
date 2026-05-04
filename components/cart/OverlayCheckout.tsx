@@ -155,7 +155,7 @@ export function OverlayCheckout({
               </h3>
               {items.length > 0 && (
                 <span className="text-[11px] font-medium uppercase tracking-wide text-primary/45">
-                  {items.reduce((n, i) => n + i.quantity, 0)} шт.
+                  {items.reduce((n, i) => n + i.quantity, 0)} {t("checkout.piecesSuffix")}
                 </span>
               )}
             </div>
@@ -192,7 +192,7 @@ export function OverlayCheckout({
           <div className="mt-6 space-y-6">
             <div>
               <label htmlFor="overlay-checkout-email" className="block text-sm font-medium text-primary/80">
-                E-mail
+                {t("checkout.emailLabel")}
               </label>
               <input
                 id="overlay-checkout-email"
@@ -200,19 +200,31 @@ export function OverlayCheckout({
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@example.com"
+                placeholder={t("checkout.emailPlaceholder")}
                 className="mt-2 w-full rounded-xl border border-primary/12 bg-white px-4 py-3 text-sm text-primary shadow-sm placeholder:text-primary/35 focus:border-accent/50 focus:outline-none focus:ring-2 focus:ring-accent/25"
               />
             </div>
 
             <fieldset className="space-y-3">
-              <legend className="text-sm font-medium text-primary/80">Способ доставки</legend>
+              <legend className="text-sm font-medium text-primary/80">{t("checkout.deliveryMethod")}</legend>
               <div className="space-y-2 rounded-xl border border-primary/10 bg-white/85 p-4 shadow-sm">
                 {(
                   [
-                    { id: "pickup" as const, label: "Самовывоз", hint: "Согласуем адрес в мессенджере" },
-                    { id: "courier" as const, label: "Курьер по городу", hint: "Стоимость уточним после заказа" },
-                    { id: "post" as const, label: "Почта / СДЭК", hint: "Отправка по Казахстану и РФ" },
+                    {
+                      id: "pickup" as const,
+                      label: t("checkout.deliveryPickup"),
+                      hint: t("checkout.deliveryPickupHint"),
+                    },
+                    {
+                      id: "courier" as const,
+                      label: t("checkout.deliveryCourier"),
+                      hint: t("checkout.deliveryCourierHint"),
+                    },
+                    {
+                      id: "post" as const,
+                      label: t("checkout.deliveryPost"),
+                      hint: t("checkout.deliveryPostHint"),
+                    },
                   ] as const
                 ).map((opt) => (
                   <label

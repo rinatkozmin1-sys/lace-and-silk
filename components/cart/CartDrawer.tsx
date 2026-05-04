@@ -44,7 +44,8 @@ function buildOrderMessage(
   totalPrice: number,
   lang: Lang,
   currency: FxCurrency,
-  rates: FxRates | null
+  rates: FxRates | null,
+  t: (path: string) => string
 ) {
   const orderLines = items
     .map((item) => {
@@ -54,7 +55,7 @@ function buildOrderMessage(
     })
     .join("\n");
   const total = formatFxAmount(totalPrice, currency, rates);
-  return `Здравствуйте! Хочу оформить заказ:\n${orderLines}\n\nИтого: ${total}`;
+  return `${t("checkout.orderMessageGreeting")}\n${orderLines}\n\n${t("cart.total")}: ${total}`;
 }
 
 export function CartDrawer() {
@@ -105,7 +106,7 @@ export function CartDrawer() {
   }, [isOpen, items.length]);
 
   const openOrderLink = (baseUrl: string) => {
-    const message = buildOrderMessage(items, totalPrice, lang, currency, rates);
+    const message = buildOrderMessage(items, totalPrice, lang, currency, rates, t);
     const url = `${baseUrl}${encodeURIComponent(message)}`;
     window.open(url, "_blank");
   };
@@ -160,7 +161,7 @@ export function CartDrawer() {
             {t("cart.currency")}
           </span>
           <CurrencySwitcher />
-          <IconButton aria-label="Закрыть" onClick={closeCart}>
+          <IconButton aria-label={t("checkout.close")} onClick={closeCart}>
             <X className="h-5 w-5" />
           </IconButton>
         </div>

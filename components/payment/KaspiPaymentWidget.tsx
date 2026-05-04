@@ -5,6 +5,7 @@ import Image from "next/image";
 import { createPortal } from "react-dom";
 import { Check, Copy, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 const KASPI_PHONE_DISPLAY = "+7 705 416 16 14";
 const KASPI_PHONE_COPY = KASPI_PHONE_DISPLAY.replace(/\s/g, "");
@@ -18,6 +19,7 @@ function KaspiQrLightbox({
   open: boolean;
   onClose: () => void;
 }) {
+  const { t } = useI18n();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -46,13 +48,13 @@ function KaspiQrLightbox({
       <button
         type="button"
         className="absolute inset-0 bg-primary/70 backdrop-blur-[2px] transition-opacity duration-300"
-        aria-label="Закрыть просмотр QR"
+        aria-label={t("checkout.kaspi.closeQrBackdrop")}
         onClick={onClose}
       />
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="QR-код Kaspi"
+        aria-label={t("checkout.kaspi.qrDialogAria")}
         className={cn(
           "relative z-10 flex max-h-[min(92dvh,900px)] w-full max-w-[min(92vw,520px)] flex-col rounded-2xl bg-white p-3 shadow-xl transition-all duration-300 ease-out sm:p-4",
           open ? "translate-y-0 scale-100 opacity-100" : "translate-y-3 scale-[0.97] opacity-0"
@@ -60,20 +62,22 @@ function KaspiQrLightbox({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-2 border-b border-primary/10 pb-2">
-          <p className="font-serif text-sm font-medium text-primary sm:text-base">QR для оплаты в Kaspi</p>
+          <p className="font-serif text-sm font-medium text-primary sm:text-base">
+            {t("checkout.kaspi.qrLightboxHeading")}
+          </p>
           <button
             type="button"
             onClick={onClose}
             className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-primary/12 bg-body/90 px-3 py-1.5 text-xs font-medium text-primary/85 transition-colors hover:border-accent/35 hover:bg-accent/5"
           >
             <X className="h-3.5 w-3.5" aria-hidden />
-            Закрыть
+            {t("checkout.close")}
           </button>
         </div>
         <div className="relative mt-3 flex min-h-0 flex-1 items-center justify-center rounded-xl bg-cream/30 p-2">
           <Image
             src="/kaspi-qr.jpg"
-            alt="QR-код Kaspi"
+            alt={t("checkout.kaspi.qrImageAlt")}
             width={900}
             height={900}
             className="h-auto max-h-[min(78dvh,720px)] w-full object-contain"
@@ -88,6 +92,7 @@ function KaspiQrLightbox({
 }
 
 export function KaspiPaymentWidget({ variant = "default" }: { variant?: KaspiPaymentVariant }) {
+  const { t } = useI18n();
   const [copied, setCopied] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
@@ -106,20 +111,20 @@ export function KaspiPaymentWidget({ variant = "default" }: { variant?: KaspiPay
 
   const title =
     variant === "checkout" || variant === "compact"
-      ? "Оплата Kaspi QR"
-      : "Оплата через Kaspi";
+      ? t("checkout.kaspi.titleQr")
+      : t("checkout.kaspi.titleVia");
 
   const phoneBlock = (
     <div className="rounded-xl border border-primary/10 bg-body/70 px-3 py-3 sm:px-4 sm:py-4">
       <p className="text-center text-xs leading-relaxed text-primary/60 sm:text-sm">
-        Если вы с телефона, вы можете сделать перевод по номеру:
+        {t("checkout.kaspi.phoneTransferHint")}
       </p>
       <div className="mt-2.5 flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-3">
         <div className="text-center sm:text-left">
           <p className="font-mono text-sm font-medium tracking-wide text-primary sm:text-base">
             {KASPI_PHONE_DISPLAY}
           </p>
-          <p className="mt-0.5 text-[11px] text-primary/50">ИП Анастасия</p>
+          <p className="mt-0.5 text-[11px] text-primary/50">{t("checkout.kaspi.recipientName")}</p>
         </div>
         <button
           type="button"
@@ -129,17 +134,17 @@ export function KaspiPaymentWidget({ variant = "default" }: { variant?: KaspiPay
             "border-primary/12 bg-white text-primary/75 hover:border-accent/35 hover:bg-accent/5 hover:text-primary",
             "focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-1 focus:ring-offset-white"
           )}
-          aria-label="Скопировать номер телефона"
+          aria-label={t("checkout.kaspi.copyPhoneAria")}
         >
           {copied ? (
             <>
               <Check className="h-3 w-3 text-primary/65" aria-hidden />
-              Скопировано
+              {t("checkout.kaspi.copied")}
             </>
           ) : (
             <>
               <Copy className="h-3 w-3 text-primary/55" aria-hidden />
-              Скопировать номер
+              {t("checkout.kaspi.copyNumber")}
             </>
           )}
         </button>
@@ -156,7 +161,7 @@ export function KaspiPaymentWidget({ variant = "default" }: { variant?: KaspiPay
         "hover:border-accent/30 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-accent/35 focus:ring-offset-2 focus:ring-offset-white",
         variant === "compact" ? "h-[88px] w-[88px]" : "h-[96px] w-[96px] sm:h-[100px] sm:w-[100px]"
       )}
-      aria-label="Открыть QR-код на весь экран"
+      aria-label={t("checkout.kaspi.openQrFullscreenAria")}
     >
       <Image
         src="/kaspi-qr.jpg"
@@ -186,13 +191,13 @@ export function KaspiPaymentWidget({ variant = "default" }: { variant?: KaspiPay
           <div className="mt-3 flex gap-3">
             {qrThumb}
             <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
-              <p className="text-xs leading-snug text-primary/55">Нажмите, чтобы увеличить QR</p>
+              <p className="text-xs leading-snug text-primary/55">{t("checkout.kaspi.tapToEnlargeQr")}</p>
               <button
                 type="button"
                 onClick={openLightbox}
                 className="w-full max-w-[160px] rounded-lg border border-primary/15 bg-body/80 py-2 text-xs font-medium text-primary/85 transition-all duration-200 hover:border-accent/35 hover:bg-accent/5"
               >
-                Показать QR
+                {t("checkout.kaspi.showQr")}
               </button>
             </div>
           </div>
@@ -219,9 +224,11 @@ export function KaspiPaymentWidget({ variant = "default" }: { variant?: KaspiPay
 
         <div className="mt-4 flex flex-col items-center sm:mt-5">
           {qrThumb}
-          <p className="mt-2 text-center text-[11px] text-primary/50 sm:text-xs">Нажмите, чтобы увеличить QR</p>
+          <p className="mt-2 text-center text-[11px] text-primary/50 sm:text-xs">
+            {t("checkout.kaspi.tapToEnlargeQr")}
+          </p>
           <p className="mt-3 max-w-sm text-center text-xs leading-relaxed text-primary/60 sm:text-sm">
-            Отсканируйте QR-код в приложении Kaspi.kz
+            {t("checkout.kaspi.scanQrInApp")}
           </p>
         </div>
 

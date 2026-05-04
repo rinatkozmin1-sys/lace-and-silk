@@ -71,7 +71,7 @@ export function CartItem({
             <button
               type="button"
               onClick={onDecrement}
-              aria-label="Уменьшить"
+              aria-label={t("cart.decreaseQuantity")}
               className="flex h-8 w-8 items-center justify-center text-primary hover:bg-primary/5"
             >
               <Minus className="h-4 w-4" />
@@ -82,14 +82,14 @@ export function CartItem({
             <button
               type="button"
               onClick={onIncrement}
-              aria-label="Увеличить"
+              aria-label={t("cart.increaseQuantity")}
               className="flex h-8 w-8 items-center justify-center text-primary hover:bg-primary/5"
             >
               <Plus className="h-4 w-4" />
             </button>
           </div>
           <IconButton
-            aria-label="Удалить"
+            aria-label={t("cart.removeItem")}
             onClick={onRemove}
             className="ml-auto text-primary/70 hover:text-primary"
           >
