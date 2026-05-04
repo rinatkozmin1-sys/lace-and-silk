@@ -24,14 +24,18 @@ import { useFxRates } from "@/lib/useFxRates";
 import { useI18n, type Lang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-/** Закрытие по жесту: px вниз или скорость свайпа (px/s, ось y) */
+/** Закрытие развёрнутой шторки: вниз по оси y */
 const DRAG_CLOSE_DISTANCE_PX = 90;
 const DRAG_CLOSE_VELOCITY_Y = 520;
 
+/** Свёрнутый peek: открытие свайпом вверх (offset.y и velocity.y отрицательны) */
+const PEEK_DRAG_CONSTRAINTS = { top: -160, bottom: 36 } as const;
+const PEEK_OPEN_DISTANCE_PX = 52;
+/** Быстрый рывок вверх (px/s); velocity.y < этого порога */
+const PEEK_OPEN_VELOCITY_Y = -400;
+
 /**
- * Нижняя граница drag по оси y (px вниз от покоя).
- * В Motion для шторки нужен bottom > 0, иначе смещение почти не набирается;
- * форма `{ top: 0, bottom: 0 }` из ТЗ здесь заменена рабочим диапазоном.
+ * Развёрнутая шторка: drag вниз; верх зафиксирован (top: 0).
  */
 const SHEET_DRAG_CONSTRAINTS = { top: 0, bottom: 560 } as const;
 
@@ -106,6 +110,18 @@ export function CartDrawer() {
     window.open(url, "_blank");
   };
 
+  const onPeekDragEnd = useCallback(
+    (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+      const pulledUp = info.offset.y < -PEEK_OPEN_DISTANCE_PX;
+      const flickUp = info.velocity.y < PEEK_OPEN_VELOCITY_Y;
+      if (pulledUp || flickUp) {
+        expandCheckoutSheet();
+      }
+    },
+    [expandCheckoutSheet]
+  );
+
+  /** Развёрнутая шторка: только смахивание вниз (нативный bottom sheet) */
   const onSheetDragEnd = useCallback(
     (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
       const movedDown = info.offset.y > DRAG_CLOSE_DISTANCE_PX;
@@ -187,31 +203,57 @@ export function CartDrawer() {
           </div>
 
           {items.length > 0 && !isCheckoutOpen && (
-            <button
-              type="button"
-              onClick={expandCheckoutSheet}
+            <motion.div
+              role="button"
+              tabIndex={0}
+              aria-label={`${t("cart.total")} — ${t("checkout.placeOrder")}`}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  expandCheckoutSheet();
+                }
+              }}
+              drag="y"
+              dragConstraints={PEEK_DRAG_CONSTRAINTS}
+              dragElastic={{ top: 0.2, bottom: 0.1 }}
+              dragMomentum={false}
+              dragTransition={{
+                bounceStiffness: 520,
+                bounceDamping: 36,
+              }}
+              onDragEnd={onPeekDragEnd}
+              onTap={expandCheckoutSheet}
+              whileTap={{ scale: 0.992 }}
               className={cn(
-                "relative z-10 shrink-0 rounded-t-3xl bg-white px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 text-left",
+                "relative z-10 mx-auto w-full max-w-full shrink-0 cursor-grab rounded-t-3xl bg-white px-5 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 active:cursor-grabbing",
                 "shadow-[0_-4px_14px_-4px_rgba(0,0,0,0.07)] ring-1 ring-black/[0.05]",
-                "transition-[transform,box-shadow] duration-300 ease-out active:scale-[0.995]"
+                "touch-none select-none"
               )}
             >
-              <div className="mx-auto mb-3 h-1 w-12 rounded-full bg-gray-300/45" aria-hidden />
-              <div className="flex items-center justify-between gap-3">
-                <div>
+              <div className="flex flex-col items-center gap-3">
+                <div
+                  className="mx-auto h-1 w-12 shrink-0 rounded-full bg-gray-300/55"
+                  aria-hidden
+                />
+                <div className="w-full text-center">
                   <p className="text-[11px] font-medium uppercase tracking-wide text-primary/45">
                     {t("cart.total")}
                   </p>
                   <PriceFx
                     amountKzt={totalPrice}
-                    className="font-product text-xl font-medium text-primary"
+                    className="mt-1 font-product text-xl font-semibold text-primary"
                   />
                 </div>
-                <span className="shrink-0 rounded-full bg-primary/[0.08] px-4 py-2.5 text-sm font-medium text-primary ring-1 ring-primary/10">
+                <span
+                  className={cn(
+                    "inline-flex w-full max-w-[min(17rem,calc(100%-2rem))] items-center justify-center rounded-full bg-primary/[0.08] px-5 py-2.5 text-center text-sm font-medium text-primary ring-1 ring-primary/10",
+                    "pointer-events-none"
+                  )}
+                >
                   {t("checkout.placeOrder")}
                 </span>
               </div>
-            </button>
+            </motion.div>
           )}
         </div>
 
