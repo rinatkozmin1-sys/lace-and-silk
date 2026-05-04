@@ -2,6 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
+import {
+  AnimatePresence,
+  motion,
+  useDragControls,
+  type PanInfo,
+} from "framer-motion";
 import { useCart, type CartItem as CartLine } from "@/lib/cart";
 import { Drawer } from "@/components/ui/Drawer";
 import { CartItem } from "./CartItem";
@@ -18,9 +24,16 @@ import { useFxRates } from "@/lib/useFxRates";
 import { useI18n, type Lang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-const SHEET_EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
-const SHEET_TRANSITION = `transform 360ms ${SHEET_EASE}`;
-const DRAG_CLOSE_PX = 88;
+/** Закрытие по жесту: px вниз или скорость свайпа (px/s, ось y) */
+const DRAG_CLOSE_DISTANCE_PX = 90;
+const DRAG_CLOSE_VELOCITY_Y = 520;
+
+/**
+ * Нижняя граница drag по оси y (px вниз от покоя).
+ * В Motion для шторки нужен bottom > 0, иначе смещение почти не набирается;
+ * форма `{ top: 0, bottom: 0 }` из ТЗ здесь заменена рабочим диапазоном.
+ */
+const SHEET_DRAG_CONSTRAINTS = { top: 0, bottom: 560 } as const;
 
 function buildOrderMessage(
   items: CartLine[],
@@ -46,15 +59,12 @@ export function CartDrawer() {
   const { rates } = useFxRates();
   const [isCheckoutVisible, setIsCheckoutVisible] = useState(false);
 
-  /** Нижняя шторка с Kaspi и мессенджерами: false — только компактная панель «Итого + Оформить» */
+  /** Развёрнутая нижняя шторка оформления (Kaspi и мессенджеры) */
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [sheetExpanded, setSheetExpanded] = useState(false);
-  const [dragOffset, setDragOffset] = useState(0);
-  const [isDraggingHandle, setIsDraggingHandle] = useState(false);
+  const dragControls = useDragControls();
 
-  const dragStartY = useRef<number | null>(null);
-  const dragOffsetRef = useRef(0);
-  const sheetClosingIntentRef = useRef(false);
+  /** Лёгкий тап по ручке без заметного перетаскивания — закрыть шторку */
+  const dragGrabRef = useRef<{ startY: number; startT: number } | null>(null);
 
   const {
     items,
@@ -67,10 +77,6 @@ export function CartDrawer() {
   } = useCart();
 
   useEffect(() => {
-    dragOffsetRef.current = dragOffset;
-  }, [dragOffset]);
-
-  useEffect(() => {
     if (!isOpen) setIsCheckoutVisible(false);
   }, [isOpen]);
 
@@ -80,39 +86,17 @@ export function CartDrawer() {
 
   const closeCheckout = () => setIsCheckoutVisible(false);
 
-  const collapseCheckoutSheet = useCallback(() => {
-    sheetClosingIntentRef.current = true;
-    setSheetExpanded(false);
-    setDragOffset(0);
-    dragStartY.current = null;
-    setIsDraggingHandle(false);
+  const closeCheckoutSheet = useCallback(() => {
+    setIsCheckoutOpen(false);
   }, []);
 
   const expandCheckoutSheet = useCallback(() => {
-    sheetClosingIntentRef.current = false;
     setIsCheckoutOpen(true);
-    setDragOffset(0);
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => setSheetExpanded(true));
-    });
-  }, []);
-
-  const onSheetTransitionEnd = useCallback((e: React.TransitionEvent<HTMLDivElement>) => {
-    if (e.target !== e.currentTarget || e.propertyName !== "transform") return;
-    if (!sheetClosingIntentRef.current) return;
-    sheetClosingIntentRef.current = false;
-    setIsCheckoutOpen(false);
-    setDragOffset(0);
   }, []);
 
   useEffect(() => {
     if (!isOpen || items.length === 0) {
-      sheetClosingIntentRef.current = false;
-      setSheetExpanded(false);
       setIsCheckoutOpen(false);
-      setDragOffset(0);
-      dragStartY.current = null;
-      setIsDraggingHandle(false);
     }
   }, [isOpen, items.length]);
 
@@ -122,44 +106,32 @@ export function CartDrawer() {
     window.open(url, "_blank");
   };
 
-  const handleHandleTouchStart = (e: React.TouchEvent) => {
-    dragStartY.current = e.touches[0]?.clientY ?? null;
-    setIsDraggingHandle(true);
+  const onSheetDragEnd = useCallback(
+    (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+      const movedDown = info.offset.y > DRAG_CLOSE_DISTANCE_PX;
+      const flickDown = info.velocity.y > DRAG_CLOSE_VELOCITY_Y;
+      if (movedDown || flickDown) {
+        closeCheckoutSheet();
+      }
+    },
+    [closeCheckoutSheet]
+  );
+
+  const startGrabDrag = (e: React.PointerEvent) => {
+    dragGrabRef.current = { startY: e.clientY, startT: performance.now() };
+    dragControls.start(e);
   };
 
-  const handleHandleTouchMove = (e: React.TouchEvent) => {
-    if (dragStartY.current === null) return;
-    const y = e.touches[0]?.clientY;
-    if (y === undefined) return;
-    const dy = y - dragStartY.current;
-    setDragOffset(Math.max(0, dy));
-  };
-
-  const handleHandleTouchEnd = () => {
-    dragStartY.current = null;
-    const d = dragOffsetRef.current;
-    setIsDraggingHandle(false);
-    if (d > DRAG_CLOSE_PX) {
-      collapseCheckoutSheet();
-      return;
+  const endGrabDrag = (e: React.PointerEvent) => {
+    const g = dragGrabRef.current;
+    dragGrabRef.current = null;
+    if (!g) return;
+    const dy = Math.abs(e.clientY - g.startY);
+    const dt = performance.now() - g.startT;
+    if (dy < 10 && dt < 320) {
+      closeCheckoutSheet();
     }
-    if (d > 0) {
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => setDragOffset(0));
-      });
-    }
   };
-
-  let sheetTransform: string;
-  if (!sheetExpanded) {
-    sheetTransform = "translateY(100%)";
-  } else if (dragOffset > 0 || isDraggingHandle) {
-    sheetTransform = `translateY(${dragOffset}px)`;
-  } else {
-    sheetTransform = "translateY(0)";
-  }
-
-  const transformTransition = isDraggingHandle ? "none" : SHEET_TRANSITION;
 
   return (
     <Drawer open={isOpen} onClose={closeCart} title={t("cart.title")} side="right">
@@ -243,90 +215,123 @@ export function CartDrawer() {
           )}
         </div>
 
-        {items.length > 0 && isCheckoutOpen && (
-          <>
-            <button
-              type="button"
-              aria-label={t("checkout.close")}
-              className={cn(
-                "absolute inset-0 z-[42] bg-neutral-900/28 backdrop-blur-[1px] transition-opacity duration-300 ease-out",
-                sheetExpanded ? "opacity-100" : "pointer-events-none opacity-0"
-              )}
-              onClick={collapseCheckoutSheet}
-            />
+        <AnimatePresence>
+          {items.length > 0 && isCheckoutOpen ? (
+            <>
+              <motion.button
+                key="cart-checkout-backdrop"
+                type="button"
+                aria-label={t("checkout.close")}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+                className="absolute inset-0 z-[42] bg-neutral-900/28 backdrop-blur-[1px]"
+                onClick={closeCheckoutSheet}
+              />
 
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[43] flex max-h-[min(88vh,100dvh)] flex-col justify-end">
               <div
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="cart-checkout-sheet-title"
-                className={cn(
-                  "pointer-events-auto flex max-h-[min(88vh,100dvh)] flex-col overflow-hidden rounded-t-3xl bg-white",
-                  "shadow-[0_-8px_32px_-8px_rgba(0,0,0,0.12)] ring-1 ring-black/[0.06]"
-                )}
-                style={{
-                  transform: sheetTransform,
-                  transition: transformTransition,
-                }}
-                onTransitionEnd={onSheetTransitionEnd}
+                key="cart-checkout-sheet-anchor"
+                className="pointer-events-none absolute inset-x-0 bottom-0 z-[43] flex max-h-[min(88vh,100dvh)] flex-col justify-end"
               >
-                <div className="sr-only" id="cart-checkout-sheet-title">
-                  {t("checkout.checkoutTitle")}
-                </div>
-
-                <button
-                  type="button"
-                  className="flex w-full shrink-0 flex-col items-center border-b border-primary/[0.06] bg-white pb-2 pt-3 outline-none transition-colors hover:bg-stone-50/90 active:bg-stone-100/80"
-                  aria-label={t("checkout.close")}
-                  onClick={collapseCheckoutSheet}
-                  onTouchStart={handleHandleTouchStart}
-                  onTouchMove={handleHandleTouchMove}
-                  onTouchEnd={handleHandleTouchEnd}
+                <motion.div
+                  key="cart-checkout-sheet"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="cart-checkout-sheet-title"
+                  initial={{ y: "100%" }}
+                  animate={{ y: 0 }}
+                  exit={{
+                    y: "100%",
+                    transition: { duration: 0.42, ease: [0.25, 1, 0.3, 1] },
+                  }}
+                  transition={{
+                    type: "spring",
+                    damping: 34,
+                    stiffness: 340,
+                    mass: 0.88,
+                  }}
+                  drag="y"
+                  dragControls={dragControls}
+                  dragListener={false}
+                  dragConstraints={SHEET_DRAG_CONSTRAINTS}
+                  dragElastic={{ top: 0, bottom: 0.14 }}
+                  dragMomentum={false}
+                  dragTransition={{
+                    bounceStiffness: 440,
+                    bounceDamping: 30,
+                  }}
+                  onDragEnd={onSheetDragEnd}
+                  className={cn(
+                    "pointer-events-auto flex max-h-[min(88vh,100dvh)] w-full flex-col overflow-hidden rounded-t-3xl bg-white",
+                    "shadow-[0_-8px_32px_-8px_rgba(0,0,0,0.12)] ring-1 ring-black/[0.06]"
+                  )}
                 >
-                  <span className="pointer-events-none mx-auto h-1.5 w-12 rounded-full bg-gray-300/70" />
-                  <span className="pointer-events-none mt-2 text-[10px] font-medium uppercase tracking-[0.12em] text-primary/35">
-                    {t("checkout.swipeDownHint")}
-                  </span>
-                </button>
+                  <div className="sr-only" id="cart-checkout-sheet-title">
+                    {t("checkout.checkoutTitle")}
+                  </div>
 
-                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-1">
-                  <div className="flex items-center justify-between text-lg font-medium text-primary">
-                    <span>{t("cart.total")}</span>
+                  <div
+                    role="presentation"
+                    className="flex shrink-0 touch-none cursor-grab flex-col items-center border-b border-primary/[0.06] bg-white pb-2 pt-3 outline-none active:cursor-grabbing"
+                    onPointerDown={startGrabDrag}
+                    onPointerUp={endGrabDrag}
+                    onPointerCancel={() => {
+                      dragGrabRef.current = null;
+                    }}
+                  >
+                    <span className="mx-auto h-1.5 w-12 rounded-full bg-gray-300/70" aria-hidden />
+                    <span className="mt-2 text-[10px] font-medium uppercase tracking-[0.12em] text-primary/35">
+                      {t("checkout.swipeDownHint")}
+                    </span>
+                  </div>
+
+                  <div
+                    className="flex shrink-0 touch-none cursor-grab items-center justify-between border-b border-primary/[0.05] bg-white px-4 pb-3 pt-3 active:cursor-grabbing"
+                    onPointerDown={startGrabDrag}
+                    onPointerUp={endGrabDrag}
+                    onPointerCancel={() => {
+                      dragGrabRef.current = null;
+                    }}
+                  >
+                    <span className="text-lg font-medium text-primary">{t("cart.total")}</span>
                     <PriceFx amountKzt={totalPrice} className="text-lg font-medium" />
                   </div>
 
-                  <div className="mt-4">
-                    <KaspiPaymentWidget variant="compact" />
-                  </div>
+                  <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3">
+                    <div className="mt-4">
+                      <KaspiPaymentWidget variant="compact" />
+                    </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setIsCheckoutVisible(true)}
-                    className="mt-4 flex w-full items-center justify-center rounded-xl border border-primary/15 bg-white py-3 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:border-accent/35 hover:bg-accent/5"
-                  >
-                    {t("checkout.placeOrder")}
-                  </button>
-
-                  <div className="mt-4 flex w-full flex-col gap-3">
-                    <Button
-                      className="w-full bg-[#25D366] py-3 text-base text-white transition-colors hover:bg-[#20b858]"
-                      onClick={() => openOrderLink("https://wa.me/77054161614?text=")}
+                    <button
+                      type="button"
+                      onClick={() => setIsCheckoutVisible(true)}
+                      className="mt-4 flex w-full items-center justify-center rounded-xl border border-primary/15 bg-white py-3 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:border-accent/35 hover:bg-accent/5"
                     >
-                      {t("cart.orderWhatsapp")}
-                    </Button>
+                      {t("checkout.placeOrder")}
+                    </button>
 
-                    <Button
-                      className="w-full bg-[#0088cc] py-3 text-base text-white transition-colors hover:bg-[#0077b3]"
-                      onClick={() => openOrderLink("https://t.me/Шарфики_Косынки?text=")}
-                    >
-                      {t("cart.orderTelegram")}
-                    </Button>
+                    <div className="mt-4 flex w-full flex-col gap-3">
+                      <Button
+                        className="w-full bg-[#25D366] py-3 text-base text-white transition-colors hover:bg-[#20b858]"
+                        onClick={() => openOrderLink("https://wa.me/77054161614?text=")}
+                      >
+                        {t("cart.orderWhatsapp")}
+                      </Button>
+
+                      <Button
+                        className="w-full bg-[#0088cc] py-3 text-base text-white transition-colors hover:bg-[#0077b3]"
+                        onClick={() => openOrderLink("https://t.me/Шарфики_Косынки?text=")}
+                      >
+                        {t("cart.orderTelegram")}
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
-            </div>
-          </>
-        )}
+            </>
+          ) : null}
+        </AnimatePresence>
 
         <OverlayCheckout
           open={isCheckoutVisible}
