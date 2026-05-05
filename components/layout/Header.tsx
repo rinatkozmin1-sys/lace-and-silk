@@ -136,7 +136,7 @@ export function Header() {
                       applySearchToUrl("");
                       setIsSearchOpen(false);
                     }}
-                    aria-label="Очистить поиск"
+                    aria-label={t("header.clearSearch")}
                     className="inline-flex h-7 w-7 items-center justify-center rounded-full text-primary/60 transition-colors hover:bg-stone-100 hover:text-primary"
                   >
                     <X className="h-4 w-4" />

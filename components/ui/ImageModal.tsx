@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { X } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 const ANIM_MS = 300;
@@ -20,6 +21,7 @@ type ImageModalProps = {
  * Рендер через portal поверх шторок корзины (z выше Kaspi lightbox).
  */
 export function ImageModal({ open, onClose, src, alt }: ImageModalProps) {
+  const { t } = useI18n();
   const [mounted, setMounted] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -74,7 +76,7 @@ export function ImageModal({ open, onClose, src, alt }: ImageModalProps) {
       <button
         type="button"
         className="absolute inset-0 bg-neutral-950/88 backdrop-blur-[2px] transition-opacity duration-300 ease-out"
-        aria-label="Закрыть просмотр"
+        aria-label={t("checkout.kaspi.closeQrBackdrop")}
         onClick={onClose}
       />
 
@@ -82,7 +84,7 @@ export function ImageModal({ open, onClose, src, alt }: ImageModalProps) {
         type="button"
         onClick={onClose}
         className="absolute right-3 top-3 z-[262] flex h-12 w-12 items-center justify-center rounded-full bg-white/95 text-neutral-900 shadow-lg ring-1 ring-black/12 transition-all duration-200 ease-out hover:bg-white hover:ring-black/18 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:right-5 sm:top-5"
-        aria-label="Закрыть"
+        aria-label={t("checkout.close")}
       >
         <X className="h-7 w-7 stroke-[2]" aria-hidden />
       </button>

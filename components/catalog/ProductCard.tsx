@@ -13,7 +13,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onAddToCart, setSelectedImage }: ProductCardProps) {
   const { lang, t } = useI18n();
-  const name = product.isExample ? "Пример" : product.name[lang] ?? product.name.ru;
+  const name = product.isExample ? t("catalog.example") : product.name[lang] ?? product.name.ru;
   return (
     <div className="group flex flex-col">
       {/* Изображение */}
@@ -23,7 +23,7 @@ export function ProductCard({ product, onAddToCart, setSelectedImage }: ProductC
             type="button"
             onClick={() => setSelectedImage(product.image)}
             className="relative block h-full w-full cursor-pointer overflow-hidden p-0 text-left"
-            aria-label="Увеличить фото"
+            aria-label={t("catalog.enlargeImage")}
           >
             <Image
               src={product.image}

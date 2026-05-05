@@ -25,6 +25,14 @@ export const dictionary = {
       uk: "Пошук товарів...",
       uz: "Tovarlarni qidirish...",
     },
+    clearSearch: {
+      ru: "Очистить поиск",
+      en: "Clear search",
+      de: "Suche löschen",
+      kk: "Іздеуді тазарту",
+      uk: "Очистити пошук",
+      uz: "Qidiruvni tozalash",
+    },
     cart: { ru: "Корзина", en: "Cart", de: "Warenkorb", kk: "Себет", uk: "Кошик", uz: "Savat" },
     language: { ru: "Язык", en: "Language", de: "Sprache", kk: "Тіл", uk: "Мова", uz: "Til" },
     currency: {
@@ -130,6 +138,16 @@ export const dictionary = {
       uz: "Qidiruv",
     },
     addToCart: { ru: "В корзину", en: "Add to cart", de: "In den Warenkorb", kk: "Себетке", uk: "У кошик", uz: "Savatga" },
+    example: { ru: "Пример", en: "Example", de: "Beispiel", kk: "Үлгі", uk: "Приклад", uz: "Namuna" },
+    enlargeImage: {
+      ru: "Увеличить фото",
+      en: "Enlarge photo",
+      de: "Foto vergrößern",
+      kk: "Фотоны үлкейту",
+      uk: "Збільшити фото",
+      uz: "Rasmni kattalashtirish",
+    },
+    scrollTop: { ru: "Наверх", en: "To top", de: "Nach oben", kk: "Жоғары", uk: "Вгору", uz: "Yuqoriga" },
     sizeLabel: { ru: "Размер", en: "Size", de: "Größe", kk: "Өлшемі", uk: "Розмір", uz: "O'lcham" },
     sizeUnit: { ru: "см", en: "cm", de: "cm", kk: "см", uk: "см", uz: "sm" },
     backToTypes: {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export function Drawer({
@@ -16,6 +17,7 @@ export function Drawer({
   title?: string;
   side?: "left" | "right";
 }) {
+  const { t } = useI18n();
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -39,7 +41,7 @@ export function Drawer({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label={title ?? "Панель"}
+        aria-label={title ?? t("header.cart")}
         className={cn(
           "fixed top-0 z-50 flex h-full w-full max-w-md flex-col bg-body shadow-xl transition-transform duration-300 ease-out",
           side === "right" ? "right-0" : "left-0"

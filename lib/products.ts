@@ -121,6 +121,51 @@ export const MATERIAL_SIZES: Partial<Record<Material, string>> = {
   "Шарф в фактурный горошек": "25х100",
 };
 
+const SHIFON_COLOR_TRANSLATIONS: Record<string, Omit<LocalizedText, "ru">> = {
+  "Пример": { en: "Example", de: "Beispiel", kk: "Үлгі", uk: "Приклад", uz: "Namuna" },
+  "Пудра": { en: "Powder", de: "Puder", kk: "Пудра", uk: "Пудра", uz: "Pudra" },
+  "Белый": { en: "White", de: "Weiß", kk: "Ақ", uk: "Білий", uz: "Oq" },
+  "Бежевый": { en: "Beige", de: "Beige", kk: "Беж", uk: "Бежевий", uz: "Bej" },
+  "Чёрный": { en: "Black", de: "Schwarz", kk: "Қара", uk: "Чорний", uz: "Qora" },
+  "Чёрный 1": { en: "Black 1", de: "Schwarz 1", kk: "Қара 1", uk: "Чорний 1", uz: "Qora 1" },
+  "Чёрный 2": { en: "Black 2", de: "Schwarz 2", kk: "Қара 2", uk: "Чорний 2", uz: "Qora 2" },
+  "Чёрный 3": { en: "Black 3", de: "Schwarz 3", kk: "Қара 3", uk: "Чорний 3", uz: "Qora 3" },
+  "Светло серый": { en: "Light gray", de: "Hellgrau", kk: "Ашық сұр", uk: "Світло-сірий", uz: "Och kulrang" },
+  "Кофейный": { en: "Coffee", de: "Kaffee", kk: "Кофе", uk: "Кавовий", uz: "Qahva rang" },
+  "Коралловый": { en: "Coral", de: "Koralle", kk: "Маржан", uk: "Кораловий", uz: "Marjon" },
+  "Серо голубой": { en: "Gray-blue", de: "Grau-Blau", kk: "Сұр-көк", uk: "Сіро-блакитний", uz: "Kulrang-ko'k" },
+  "Оливковый": { en: "Olive", de: "Oliv", kk: "Зәйтүн", uk: "Оливковий", uz: "Zaytun rang" },
+  "Серый": { en: "Gray", de: "Grau", kk: "Сұр", uk: "Сірий", uz: "Kulrang" },
+  "Бежево розовый": { en: "Beige pink", de: "Beige-Rosa", kk: "Беж-қызғылт", uk: "Бежево-рожевий", uz: "Bej-pushti" },
+  "Тёмно синий": { en: "Dark blue", de: "Dunkelblau", kk: "Қою көк", uk: "Темно-синій", uz: "To'q ko'k" },
+  "Шоколадный": { en: "Chocolate", de: "Schokolade", kk: "Шоколад", uk: "Шоколадний", uz: "Shokolad rang" },
+  "Розовый": { en: "Pink", de: "Rosa", kk: "Қызғылт", uk: "Рожевий", uz: "Pushti" },
+  "Хвойный": { en: "Pine", de: "Tannengrün", kk: "Қылқан", uk: "Хвойний", uz: "Ignabargli yashil" },
+  "Капучино": { en: "Cappuccino", de: "Cappuccino", kk: "Капучино", uk: "Капучино", uz: "Kapuchino" },
+  "Светло сиреневый": {
+    en: "Light lilac",
+    de: "Helllila",
+    kk: "Ашық сирень",
+    uk: "Світло-бузковий",
+    uz: "Och binafsha",
+  },
+  "Небесно серый": { en: "Sky gray", de: "Himmelgrau", kk: "Аспан-сұр", uk: "Небесно-сірий", uz: "Osmon-kulrang" },
+  "Голубой": { en: "Sky blue", de: "Hellblau", kk: "Көгілдір", uk: "Блакитний", uz: "Havorang" },
+  "Светло бежевый": { en: "Light beige", de: "Hellbeige", kk: "Ашық беж", uk: "Світло-бежевий", uz: "Och bej" },
+  "Молочный": { en: "Milky", de: "Milchig", kk: "Сүт түсті", uk: "Молочний", uz: "Sut rang" },
+  "Сиреневый": { en: "Lilac", de: "Lila", kk: "Сирень", uk: "Бузковий", uz: "Siren" },
+  "Кремовый": { en: "Cream", de: "Creme", kk: "Крем", uk: "Кремовий", uz: "Krem rang" },
+  "Светло розовый": { en: "Light pink", de: "Hellrosa", kk: "Ашық қызғылт", uk: "Світло-рожевий", uz: "Och pushti" },
+};
+
+function localizeShifonColorName(ruName: string): LocalizedText {
+  const tx = SHIFON_COLOR_TRANSLATIONS[ruName];
+  if (!tx) {
+    return { ru: ruName, en: ruName, de: ruName, kk: ruName, uk: ruName, uz: ruName };
+  }
+  return { ru: ruName, ...tx };
+}
+
 const ATLAS_GOFRE_PRINT_PRICE = 1800;
 
 function atlasGofrePrintProduct(n: number): Product {
@@ -219,16 +264,10 @@ function gofreGorohProduct(n: number): Product {
   const shifonNum = (n - 1).toString().padStart(2, "0");
   const imageName = n === 1 ? "gofre_goroh_01.jpg" : `shifon_gofre_gorox_${shifonNum}.jpg`;
   const ruName = SHIFON_GOFRE_GOROH_RU_NAMES[n - 1] ?? `Шифон гофре горох ${n}`;
+  const localizedName = localizeShifonColorName(ruName);
   return {
     id: `gofre-goroh-${num}`,
-    name: {
-      ru: ruName,
-      en: ruName,
-      de: ruName,
-      kk: ruName,
-      uk: ruName,
-      uz: ruName,
-    },
+    name: localizedName,
     image: `/gofre_goroh/${imageName}`,
     price: GOFRE_GOROH_PRICE,
     category: "Шифон гофре горох",
@@ -265,16 +304,10 @@ const SHIFON_GOFRE_ODNOTON_RU_NAMES = [
 function shifonGofreOdnotonProduct(n: number): Product {
   const num = n.toString().padStart(2, "0");
   const ruName = SHIFON_GOFRE_ODNOTON_RU_NAMES[n - 1] ?? `Шифон гофре однотон ${n}`;
+  const localizedName = localizeShifonColorName(ruName);
   return {
     id: `shifon-gofre-odnoton-${num}`,
-    name: {
-      ru: ruName,
-      en: ruName,
-      de: ruName,
-      kk: ruName,
-      uk: ruName,
-      uz: ruName,
-    },
+    name: localizedName,
     image: `/shifon_gofre_odnoton/shifon_gofre_odnoton_${num}.jpg`,
     price: SHIFON_GOFRE_ODNOTON_PRICE,
     category: "Шифон гофре однотон",
@@ -328,21 +361,34 @@ const GOFRE_KRAP_11: Product[] = Array.from({ length: 11 }, (_, i) =>
 );
 
 const GOFRE_CVETOK_PRICE = 1800;
+const SHIFON_GOFRE_CVETOK_RU_NAMES = [
+  "Пример",
+  "Серый",
+  "Чёрный 1",
+  "Молочный",
+  "Голубой",
+  "Сиреневый",
+  "Чёрный 2",
+  "Бежевый",
+  "Кремовый",
+  "Белый",
+  "Светло розовый",
+  "Чёрный 3",
+  "Бежевый",
+  "Голубой",
+  "Кремовый",
+  "Серый",
+] as const;
 
 function gofreCvetokProduct(n: number): Product {
   const num = n.toString().padStart(2, "0");
   const imageName =
     n <= 11 ? `gofre_cvetok_${num}.jpg` : `shifon_gofre_cvetok_${num}.jpg`;
+  const ruName = SHIFON_GOFRE_CVETOK_RU_NAMES[n - 1] ?? `Шифон гофре цветок ${n}`;
+  const localizedName = localizeShifonColorName(ruName);
   return {
     id: `gofre-cvetok-${num}`,
-    name: {
-      ru: `Шифон гофре цветок - Вариант ${n}`,
-      en: `Chiffon floral crinkle - Variant ${n}`,
-      de: `Chiffon-Crêpe mit Blumen - Variante ${n}`,
-      kk: `Шифон гүлді гофре - Нұсқа ${n}`,
-      uk: `Шифон гофре в квіточок - Варіант ${n}`,
-      uz: `Shifon gulli gofre - Variant ${n}`,
-    },
+    name: localizedName,
     image: `/gofre_cvetok/${imageName}`,
     price: GOFRE_CVETOK_PRICE,
     category: "Шифон гофре цветок",
