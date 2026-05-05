@@ -73,5 +73,12 @@ export async function fetchProductsFromSupabase(): Promise<{
     .map(mapRowToProduct)
     .filter((item): item is Product => item !== null);
 
-  return { data: products, error: null };
+  const seen = new Set<Material>();
+  const productsWithExamples = products.map((product) => {
+    if (seen.has(product.category)) return product;
+    seen.add(product.category);
+    return { ...product, isExample: true };
+  });
+
+  return { data: productsWithExamples, error: null };
 }

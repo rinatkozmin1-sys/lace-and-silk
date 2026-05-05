@@ -3,6 +3,7 @@ export type Material =
   | "Атлас принт"
   | "Гофре принт"
   | "Шифон гофре горох"
+  | "Шифон гофре однотон"
   | "Гофре в фактурный горошек"
   | "Шифон гофре цветок"
   | "Зауженный атлас"
@@ -35,6 +36,8 @@ export interface Product {
   /** Категория для фильтра каталога (совпадает с `material` у текущих товаров) */
   category: Material;
   material: Material;
+  /** Демонстрационная карточка (пример на манекене) — без цены и кнопки «В корзину» в сетке */
+  isExample?: boolean;
 
   badge: Badge;
 }
@@ -46,6 +49,7 @@ export const CATALOG_CATEGORIES = [
   "Атлас принт",
   "Гофре принт",
   "Шифон гофре горох",
+  "Шифон гофре однотон",
   "Гофре в фактурный горошек",
   "Шифон гофре цветок",
   "Зауженный атлас",
@@ -65,6 +69,7 @@ export const MATERIALS: Material[] = [
   "Атлас принт",
   "Гофре принт",
   "Шифон гофре горох",
+  "Шифон гофре однотон",
   "Гофре в фактурный горошек",
   "Шифон гофре цветок",
   "Зауженный атлас",
@@ -84,6 +89,7 @@ export const CATEGORY_COVER_OVERRIDES: Partial<Record<Material, string>> = {
   "Атлас принт": "/atlas_print/atlas_print_01.jpg",
   "Гофре принт": "/gofre_print/gofre_print_01.jpg",
   "Шифон гофре горох": "/gofre_goroh/gofre_goroh_01.jpg",
+  "Шифон гофре однотон": "/shifon_gofre_odnoton/shifon_gofre_odnoton_01.jpg",
   "Гофре в фактурный горошек": "/gofre_crap/gofre_krap_01.jpg",
   "Шифон гофре цветок": "/gofre_cvetok/gofre_cvetok_01.jpg",
   "Зауженный атлас": "/zayzh_atlas/zayzh_atlas_01.jpg",
@@ -200,6 +206,32 @@ function gofreGorohProduct(n: number): Product {
 
 const GOFRE_GOROH_10: Product[] = Array.from({ length: 10 }, (_, i) =>
   gofreGorohProduct(i + 1)
+);
+
+const SHIFON_GOFRE_ODNOTON_PRICE = 1800;
+
+function shifonGofreOdnotonProduct(n: number): Product {
+  const num = n.toString().padStart(2, "0");
+  return {
+    id: `shifon-gofre-odnoton-${num}`,
+    name: {
+      ru: `Шифон гофре однотон - Вариант ${n}`,
+      en: `Chiffon crinkle plain - Variant ${n}`,
+      de: `Chiffon-Crêpe einfarbig - Variante ${n}`,
+      kk: `Шифон гофре бір түсті - Нұсқа ${n}`,
+      uk: `Шифон гофре однотон - Варіант ${n}`,
+      uz: `Shifon gofre bir rangli - Variant ${n}`,
+    },
+    image: `/shifon_gofre_odnoton/shifon_gofre_odnoton_${num}.jpg`,
+    price: SHIFON_GOFRE_ODNOTON_PRICE,
+    category: "Шифон гофре однотон",
+    material: "Шифон гофре однотон",
+    badge: "New",
+  };
+}
+
+const SHIFON_GOFRE_ODNOTON_17: Product[] = Array.from({ length: 17 }, (_, i) =>
+  shifonGofreOdnotonProduct(i + 1)
 );
 
 const GOFRE_KRAP_PRICE = 1800;
@@ -590,11 +622,21 @@ export function getCategoryCoverImage(material: Material, allProducts: Product[]
   return allProducts.find((p) => p.category === material)?.image ?? "";
 }
 
-export const products: Product[] = [
+function markFirstProductAsExample(allProducts: Product[]): Product[] {
+  const seen = new Set<Material>();
+  return allProducts.map((product) => {
+    if (seen.has(product.category)) return product;
+    seen.add(product.category);
+    return { ...product, isExample: true };
+  });
+}
+
+export const products: Product[] = markFirstProductAsExample([
   ...ATLAS_GOFRE_PRINT_24,
   ...ATLAS_PRINT_06,
   ...GOFRE_PRINT_24,
   ...GOFRE_GOROH_10,
+  ...SHIFON_GOFRE_ODNOTON_17,
   ...GOFRE_KRAP_11,
   ...GOFRE_CVETOK_16,
   ...ZAYZH_ATLAS_17,
@@ -605,4 +647,4 @@ export const products: Product[] = [
   ...KOSYNKA_KRAP_07,
   ...KOSYNKA_ROMB_GOFRE_07,
   ...SHARF_KRAP_08,
-];
+]);

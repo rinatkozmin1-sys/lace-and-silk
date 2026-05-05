@@ -12,6 +12,14 @@ export const CATEGORY_LABELS: Record<CatalogCategoryFilter, Record<Lang, string>
     uk: "Шифон гофре в горошок",
     uz: "Shifon nuqtali gofre",
   },
+  "Шифон гофре однотон": {
+    ru: "Шифон гофре однотон",
+    en: "Chiffon crinkle plain",
+    de: "Chiffon-Crêpe einfarbig",
+    kk: "Шифон гофре бір түсті",
+    uk: "Шифон гофре однотон",
+    uz: "Shifon gofre bir rangli",
+  },
   "Гофре в фактурный горошек": {
     ru: "Гофре в фактурный горошек",
     en: "Speckled crinkle",

@@ -13,7 +13,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onAddToCart, setSelectedImage }: ProductCardProps) {
   const { lang, t } = useI18n();
-  const name = product.name[lang] ?? product.name.ru;
+  const name = product.isExample ? "Пример" : product.name[lang] ?? product.name.ru;
   return (
     <div className="group flex flex-col">
       {/* Изображение */}
@@ -43,16 +43,18 @@ export function ProductCard({ product, onAddToCart, setSelectedImage }: ProductC
           {name}
         </h3>
 
-        <PriceFx amountKzt={product.price} className="text-xs md:text-sm" />
+        {!product.isExample && <PriceFx amountKzt={product.price} className="text-xs md:text-sm" />}
       </div>
 
       {/* Кнопка: светлая рамка и рабочая логика */}
-      <button
-        onClick={() => onAddToCart(product)}
-        className="mt-4 w-full py-2 px-4 bg-transparent border border-primary/20 text-primary text-sm font-medium rounded-lg hover:bg-primary/5 hover:border-primary/40 transition-all duration-200"
-      >
-        {t("catalog.addToCart")}
-      </button>
+      {!product.isExample && (
+        <button
+          onClick={() => onAddToCart(product)}
+          className="mt-4 w-full rounded-lg border border-primary/20 bg-transparent px-4 py-2 text-sm font-medium text-primary transition-all duration-200 hover:border-primary/40 hover:bg-primary/5"
+        >
+          {t("catalog.addToCart")}
+        </button>
+      )}
     </div>
   );
 }

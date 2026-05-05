@@ -14,7 +14,7 @@ function localizeName(name: string): LocalizedText {
 
 /** Преобразует строки из Supabase в модель каталога для UI. */
 export function productRowsToUiProducts(rows: ProductRow[]): Product[] {
-  return rows.map((row, index) => {
+  const mapped = rows.map((row, index) => {
     const titleFromDb = typeof row.name === "string" ? row.name.trim() : "";
     const categoryFromDb = typeof row.category === "string" ? row.category.trim() : "";
     let priceVal =
@@ -39,6 +39,13 @@ export function productRowsToUiProducts(rows: ProductRow[]): Product[] {
       material: normalizedCategory,
       badge: null,
     };
+  });
+
+  const seen = new Set<Material>();
+  return mapped.map((product) => {
+    if (seen.has(product.category)) return product;
+    seen.add(product.category);
+    return { ...product, isExample: true };
   });
 }
 
