@@ -2,7 +2,7 @@ export type Material =
   | "Атлас гофре принт"
   | "Атлас принт"
   | "Гофре принт"
-  | "Гофре в горошек"
+  | "Шифон гофре горох"
   | "Гофре в фактурный горошек"
   | "Шифон гофре цветок"
   | "Зауженный атлас"
@@ -45,7 +45,7 @@ export const CATALOG_CATEGORIES = [
   "Атлас гофре принт",
   "Атлас принт",
   "Гофре принт",
-  "Гофре в горошек",
+  "Шифон гофре горох",
   "Гофре в фактурный горошек",
   "Шифон гофре цветок",
   "Зауженный атлас",
@@ -64,7 +64,7 @@ export const MATERIALS: Material[] = [
   "Атлас гофре принт",
   "Атлас принт",
   "Гофре принт",
-  "Гофре в горошек",
+  "Шифон гофре горох",
   "Гофре в фактурный горошек",
   "Шифон гофре цветок",
   "Зауженный атлас",
@@ -83,7 +83,7 @@ export const CATEGORY_COVER_OVERRIDES: Partial<Record<Material, string>> = {
   "Атлас гофре принт": "/atlas_gofre_print/atlas_gofre_print_01.jpg",
   "Атлас принт": "/atlas_print/atlas_print_01.jpg",
   "Гофре принт": "/gofre_print/gofre_print_01.jpg",
-  "Гофре в горошек": "/gofre_goroh/gofre_goroh_01.jpg",
+  "Шифон гофре горох": "/gofre_goroh/gofre_goroh_01.jpg",
   "Гофре в фактурный горошек": "/gofre_crap/gofre_krap_01.jpg",
   "Шифон гофре цветок": "/gofre_cvetok/gofre_cvetok_01.jpg",
   "Зауженный атлас": "/zayzh_atlas/zayzh_atlas_01.jpg",
@@ -176,35 +176,24 @@ const GOFRE_PRINT_24: Product[] = Array.from({ length: 24 }, (_, i) =>
 );
 
 const GOFRE_GOROH_PRICE = 1800;
-const GOFRE_GOROH_RU_NAMES = [
-  "Пример",
-  "Серый в чёрную точку",
-  "Бежевый в чёрную точку",
-  "Коралл в чёрную точку",
-  "Оливковый в белую точку",
-  "Белый в чёрную точку",
-  "Голубой в белую точку",
-  "Розовый в белую точку",
-  "Светло кофейный в точку",
-  "Чёрный в белую точку",
-] as const;
-
 function gofreGorohProduct(n: number): Product {
   const num = n.toString().padStart(2, "0");
+  const shifonNum = (n - 1).toString().padStart(2, "0");
+  const imageName = n === 1 ? "gofre_goroh_01.jpg" : `shifon_gofre_gorox_${shifonNum}.jpg`;
   return {
     id: `gofre-goroh-${num}`,
     name: {
-      ru: GOFRE_GOROH_RU_NAMES[n - 1] ?? `Гофре в горошек ${num}`,
-      en: `Polka-dot crinkle — Variant ${num}`,
-      de: `Crêpe mit Punkten — Variante ${num}`,
-      kk: `Бұршақты гофре — Нұсқа ${num}`,
-      uk: `Гофре в горошок — Варіант ${num}`,
-      uz: `Nuqtali gofre — Variant ${num}`,
+      ru: `Шифон гофре горох - Вариант ${n}`,
+      en: `Chiffon polka-dot crinkle - Variant ${n}`,
+      de: `Chiffon-Crêpe mit Punkten - Variante ${n}`,
+      kk: `Шифон гофре бұршақ - Нұсқа ${n}`,
+      uk: `Шифон гофре в горошок - Варіант ${n}`,
+      uz: `Shifon nuqtali gofre - Variant ${n}`,
     },
-    image: `/gofre_goroh/gofre_goroh_${num}.jpg`,
+    image: `/gofre_goroh/${imageName}`,
     price: GOFRE_GOROH_PRICE,
-    category: "Гофре в горошек",
-    material: "Гофре в горошек",
+    category: "Шифон гофре горох",
+    material: "Шифон гофре горох",
     badge: "New",
   };
 }

@@ -4,13 +4,13 @@ import type { Lang } from "@/lib/i18n";
 /** Подписи категорий для фильтра и для карточек уровня 1 */
 export const CATEGORY_LABELS: Record<CatalogCategoryFilter, Record<Lang, string>> = {
   Все: { ru: "Все", en: "All", de: "Alle", kk: "Барлығы", uk: "Усі", uz: "Barchasi" },
-  "Гофре в горошек": {
-    ru: "Гофре в горошек",
-    en: "Polka-dot crinkle",
-    de: "Crêpe mit Punkten",
-    kk: "Бұршақты гофре",
-    uk: "Гофре в горошок",
-    uz: "Nuqtali gofre",
+  "Шифон гофре горох": {
+    ru: "Шифон гофре горох",
+    en: "Chiffon polka-dot crinkle",
+    de: "Chiffon-Crêpe mit Punkten",
+    kk: "Шифон гофре бұршақ",
+    uk: "Шифон гофре в горошок",
+    uz: "Shifon nuqtali gofre",
   },
   "Гофре в фактурный горошек": {
     ru: "Гофре в фактурный горошек",
