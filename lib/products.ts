@@ -228,18 +228,38 @@ const GOFRE_GOROH_10: Product[] = Array.from({ length: 10 }, (_, i) =>
 );
 
 const SHIFON_GOFRE_ODNOTON_PRICE = 1800;
+const SHIFON_GOFRE_ODNOTON_RU_NAMES = [
+  "Пример",
+  "Серый",
+  "Бежево розовый",
+  "Белый",
+  "Чёрный",
+  "Тёмно синий",
+  "Кофейный",
+  "Шоколадный",
+  "Пудра",
+  "Розовый",
+  "Хвойный",
+  "Капучино",
+  "Светло сиреневый",
+  "Светло серый",
+  "Небесно серый",
+  "Голубой",
+  "Светло бежевый",
+] as const;
 
 function shifonGofreOdnotonProduct(n: number): Product {
   const num = n.toString().padStart(2, "0");
+  const ruName = SHIFON_GOFRE_ODNOTON_RU_NAMES[n - 1] ?? `Шифон гофре однотон ${n}`;
   return {
     id: `shifon-gofre-odnoton-${num}`,
     name: {
-      ru: `Шифон гофре однотон - Вариант ${n}`,
-      en: `Chiffon crinkle plain - Variant ${n}`,
-      de: `Chiffon-Crêpe einfarbig - Variante ${n}`,
-      kk: `Шифон гофре бір түсті - Нұсқа ${n}`,
-      uk: `Шифон гофре однотон - Варіант ${n}`,
-      uz: `Shifon gofre bir rangli - Variant ${n}`,
+      ru: ruName,
+      en: ruName,
+      de: ruName,
+      kk: ruName,
+      uk: ruName,
+      uz: ruName,
     },
     image: `/shifon_gofre_odnoton/shifon_gofre_odnoton_${num}.jpg`,
     price: SHIFON_GOFRE_ODNOTON_PRICE,
