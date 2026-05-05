@@ -20,13 +20,13 @@ export const CATEGORY_LABELS: Record<CatalogCategoryFilter, Record<Lang, string>
     uk: "Гофре в фактурний горошок",
     uz: "Nuqtali mayda gofre",
   },
-  "Гофре в цветочек": {
-    ru: "Гофре в цветочек",
-    en: "Floral crinkle",
-    de: "Crêpe mit Blumen",
-    kk: "Гүлді гофре",
-    uk: "Гофре в квіточок",
-    uz: "Gulli gofre",
+  "Шифон гофре цветок": {
+    ru: "Шифон гофре цветок",
+    en: "Chiffon floral crinkle",
+    de: "Chiffon-Crêpe mit Blumen",
+    kk: "Шифон гофре гүлді",
+    uk: "Шифон гофре в квіточок",
+    uz: "Shifon gulli gofre",
   },
   "Атлас гофре принт": {
     ru: "Атлас гофре принт",

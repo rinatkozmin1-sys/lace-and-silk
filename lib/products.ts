@@ -4,7 +4,7 @@ export type Material =
   | "Гофре принт"
   | "Гофре в горошек"
   | "Гофре в фактурный горошек"
-  | "Гофре в цветочек"
+  | "Шифон гофре цветок"
   | "Зауженный атлас"
   | "Зауженный гофре"
   | "Зауженная жатка"
@@ -47,7 +47,7 @@ export const CATALOG_CATEGORIES = [
   "Гофре принт",
   "Гофре в горошек",
   "Гофре в фактурный горошек",
-  "Гофре в цветочек",
+  "Шифон гофре цветок",
   "Зауженный атлас",
   "Зауженный гофре",
   "Зауженная жатка",
@@ -66,7 +66,7 @@ export const MATERIALS: Material[] = [
   "Гофре принт",
   "Гофре в горошек",
   "Гофре в фактурный горошек",
-  "Гофре в цветочек",
+  "Шифон гофре цветок",
   "Зауженный атлас",
   "Зауженный гофре",
   "Зауженная жатка",
@@ -85,7 +85,7 @@ export const CATEGORY_COVER_OVERRIDES: Partial<Record<Material, string>> = {
   "Гофре принт": "/gofre_print/gofre_print_01.jpg",
   "Гофре в горошек": "/gofre_goroh/gofre_goroh_01.jpg",
   "Гофре в фактурный горошек": "/gofre_crap/gofre_krap_01.jpg",
-  "Гофре в цветочек": "/gofre_cvetok/gofre_cvetok_01.jpg",
+  "Шифон гофре цветок": "/gofre_cvetok/gofre_cvetok_01.jpg",
   "Зауженный атлас": "/zayzh_atlas/zayzh_atlas_01.jpg",
   "Зауженный гофре": "/zayzh_gofre/zayzh_gofre_01.jpg",
   "Зауженная жатка": "/zayzh_zhatka/zayzh_zhatka_01.jpg",
@@ -257,25 +257,27 @@ const GOFRE_CVETOK_PRICE = 1800;
 
 function gofreCvetokProduct(n: number): Product {
   const num = n.toString().padStart(2, "0");
+  const imageName =
+    n <= 11 ? `gofre_cvetok_${num}.jpg` : `shifon_gofre_cvetok_${num}.jpg`;
   return {
     id: `gofre-cvetok-${num}`,
     name: {
-      ru: `Гофре в цветочек — Вариант ${num}`,
-      en: `Floral crinkle — Variant ${num}`,
-      de: `Crêpe mit Blumen — Variante ${num}`,
-      kk: `Гүлді гофре — Нұсқа ${num}`,
-      uk: `Гофре в квіточок — Варіант ${num}`,
-      uz: `Gulli gofre — Variant ${num}`,
+      ru: `Шифон гофре цветок - Вариант ${n}`,
+      en: `Chiffon floral crinkle - Variant ${n}`,
+      de: `Chiffon-Crêpe mit Blumen - Variante ${n}`,
+      kk: `Шифон гүлді гофре - Нұсқа ${n}`,
+      uk: `Шифон гофре в квіточок - Варіант ${n}`,
+      uz: `Shifon gulli gofre - Variant ${n}`,
     },
-    image: `/gofre_cvetok/gofre_cvetok_${num}.jpg`,
+    image: `/gofre_cvetok/${imageName}`,
     price: GOFRE_CVETOK_PRICE,
-    category: "Гофре в цветочек",
-    material: "Гофре в цветочек",
+    category: "Шифон гофре цветок",
+    material: "Шифон гофре цветок",
     badge: "New",
   };
 }
 
-const GOFRE_CVETOK_11: Product[] = Array.from({ length: 11 }, (_, i) =>
+const GOFRE_CVETOK_16: Product[] = Array.from({ length: 16 }, (_, i) =>
   gofreCvetokProduct(i + 1)
 );
 
@@ -605,7 +607,7 @@ export const products: Product[] = [
   ...GOFRE_PRINT_24,
   ...GOFRE_GOROH_10,
   ...GOFRE_KRAP_11,
-  ...GOFRE_CVETOK_11,
+  ...GOFRE_CVETOK_16,
   ...ZAYZH_ATLAS_17,
   ...ZAYZH_GOFRE_30,
   ...ZAYZH_ZHATKA_07,
