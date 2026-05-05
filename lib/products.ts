@@ -125,7 +125,7 @@ function atlasGofrePrintProduct(n: number): Product {
   };
 }
 
-const ATLAS_GOFRE_PRINT_24: Product[] = Array.from({ length: 24 }, (_, i) =>
+const ATLAS_GOFRE_PRINT_26: Product[] = Array.from({ length: 26 }, (_, i) =>
   atlasGofrePrintProduct(i + 1)
 );
 
@@ -634,7 +634,7 @@ function markFirstProductAsExample(allProducts: Product[]): Product[] {
 }
 
 export const products: Product[] = markFirstProductAsExample([
-  ...ATLAS_GOFRE_PRINT_24,
+  ...ATLAS_GOFRE_PRINT_26,
   ...ATLAS_PRINT_06,
   ...GOFRE_PRINT_24,
   ...GOFRE_GOROH_10,
