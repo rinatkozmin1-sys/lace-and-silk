@@ -38,6 +38,8 @@ export interface Product {
   material: Material;
   /** Демонстрационная карточка (пример на манекене) — без цены и кнопки «В корзину» в сетке */
   isExample?: boolean;
+  /** Габариты изделия в сантиметрах, например `85х45` */
+  size?: string;
 
   badge: Badge;
 }
@@ -100,6 +102,23 @@ export const CATEGORY_COVER_OVERRIDES: Partial<Record<Material, string>> = {
   "Косынка в фактурный горошек": "/kosynka_krap/kosynka_krap_01.jpg",
   "Косынка ромб гофре": "/kosynka_romb_gofre/kosynka_romb_gofre_01.jpg",
   "Шарф в фактурный горошек": "/sharf_krap/sharf_krap_01.jpg",
+};
+
+/** Размеры по видам (см). */
+export const MATERIAL_SIZES: Partial<Record<Material, string>> = {
+  "Атлас гофре принт": "85х45",
+  "Атлас принт": "70х70",
+  "Гофре принт": "85х45",
+  "Шифон гофре горох": "85х45",
+  "Шифон гофре цветок": "85х45",
+  "Зауженный атлас": "9х110",
+  "Зауженный гофре": "10х110",
+  "Зауженная жатка": "9х110",
+  "Зауженные с проблеском": "9х110",
+  "Зауженный шифон": "9х110",
+  "Косынка в фактурный горошек": "65х65",
+  "Косынка ромб гофре": "85х45",
+  "Шарф в фактурный горошек": "25х100",
 };
 
 const ATLAS_GOFRE_PRINT_PRICE = 1800;
@@ -627,9 +646,10 @@ export function getCategoryCoverImage(material: Material, allProducts: Product[]
 function markFirstProductAsExample(allProducts: Product[]): Product[] {
   const seen = new Set<Material>();
   return allProducts.map((product) => {
-    if (seen.has(product.category)) return product;
+    const size = MATERIAL_SIZES[product.category];
+    if (seen.has(product.category)) return size ? { ...product, size } : product;
     seen.add(product.category);
-    return { ...product, isExample: true };
+    return { ...product, isExample: true, size };
   });
 }
 

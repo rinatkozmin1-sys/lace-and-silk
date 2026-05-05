@@ -1,6 +1,12 @@
 "use client";
 
-import { MATERIALS, type LocalizedText, type Material, type Product } from "@/lib/products";
+import {
+  MATERIAL_SIZES,
+  MATERIALS,
+  type LocalizedText,
+  type Material,
+  type Product,
+} from "@/lib/products";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 
 type SupabaseProductRow = {
@@ -75,9 +81,10 @@ export async function fetchProductsFromSupabase(): Promise<{
 
   const seen = new Set<Material>();
   const productsWithExamples = products.map((product) => {
-    if (seen.has(product.category)) return product;
+    const size = MATERIAL_SIZES[product.category];
+    if (seen.has(product.category)) return size ? { ...product, size } : product;
     seen.add(product.category);
-    return { ...product, isExample: true };
+    return { ...product, isExample: true, size };
   });
 
   return { data: productsWithExamples, error: null };

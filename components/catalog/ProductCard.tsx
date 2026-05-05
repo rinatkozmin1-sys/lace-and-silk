@@ -42,6 +42,11 @@ export function ProductCard({ product, onAddToCart, setSelectedImage }: ProductC
         <h3 className="font-product text-sm font-medium leading-tight text-foreground md:text-base lg:text-lg">
           {name}
         </h3>
+        {product.size ? (
+          <p className="text-[11px] font-medium text-primary/65 md:text-xs">
+            {t("catalog.sizeLabel")}: {product.size} {t("catalog.sizeUnit")}
+          </p>
+        ) : null}
 
         {!product.isExample && <PriceFx amountKzt={product.price} className="text-xs md:text-sm" />}
       </div>

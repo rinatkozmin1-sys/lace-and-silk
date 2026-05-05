@@ -1,5 +1,5 @@
 import type { ProductRow } from "@/lib/catalogProductQuery";
-import type { LocalizedText, Material, Product } from "@/lib/products";
+import { MATERIAL_SIZES, type LocalizedText, type Material, type Product } from "@/lib/products";
 
 function localizeName(name: string): LocalizedText {
   return {
@@ -43,9 +43,10 @@ export function productRowsToUiProducts(rows: ProductRow[]): Product[] {
 
   const seen = new Set<Material>();
   return mapped.map((product) => {
-    if (seen.has(product.category)) return product;
+    const size = MATERIAL_SIZES[product.category];
+    if (seen.has(product.category)) return size ? { ...product, size } : product;
     seen.add(product.category);
-    return { ...product, isExample: true };
+    return { ...product, isExample: true, size };
   });
 }
 

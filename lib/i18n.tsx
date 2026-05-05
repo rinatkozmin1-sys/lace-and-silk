@@ -130,6 +130,8 @@ export const dictionary = {
       uz: "Qidiruv",
     },
     addToCart: { ru: "В корзину", en: "Add to cart", de: "In den Warenkorb", kk: "Себетке", uk: "У кошик", uz: "Savatga" },
+    sizeLabel: { ru: "Размер", en: "Size", de: "Größe", kk: "Өлшемі", uk: "Розмір", uz: "O'lcham" },
+    sizeUnit: { ru: "см", en: "cm", de: "cm", kk: "см", uk: "см", uz: "sm" },
     backToTypes: {
       ru: "← Назад к видам",
       en: "← Back to types",
