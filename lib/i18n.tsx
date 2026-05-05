@@ -43,22 +43,6 @@ export const dictionary = {
       uk: "Валюта",
       uz: "Valyuta",
     },
-    installApp: {
-      ru: "Скачать приложение на главный экран",
-      en: "Download app to Home Screen",
-      de: "App auf den Startbildschirm laden",
-      kk: "Қолданбаны басты экранға жүктеу",
-      uk: "Завантажити застосунок на головний екран",
-      uz: "Ilovani asosiy ekranga yuklab olish",
-    },
-    installAppShort: {
-      ru: "Скачать",
-      en: "Download",
-      de: "Herunterladen",
-      kk: "Жүктеу",
-      uk: "Завантажити",
-      uz: "Yuklab olish",
-    },
   },
   hero: {
     title: {
