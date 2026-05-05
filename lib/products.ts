@@ -547,19 +547,21 @@ const KOSYNKA_ROMB_GOFRE_RU_NAMES = [
   "Кремовый",
   "Мятный",
   "Светло фисташковый",
+  "Жемчужный",
 ] as const;
 
 function kosynkaRombGofreProduct(n: number): Product {
   const num = n.toString().padStart(2, "0");
+  const isPearl = n === 8;
   return {
     id: `kosynka-romb-gofre-${num}`,
     name: {
       ru: KOSYNKA_ROMB_GOFRE_RU_NAMES[n - 1] ?? `Косынка ромб гофре ${num}`,
-      en: `Diamond crinkle kerchief — Variant ${num}`,
-      de: `Rauten-Crêpe-Tuch — Variante ${num}`,
-      kk: `Ромб гофре косынка — Нұсқа ${num}`,
-      uk: `Косинка ромб гофре — Варіант ${num}`,
-      uz: `Romb gofre ro'molcha — Variant ${num}`,
+      en: isPearl ? "Pearl" : `Diamond crinkle kerchief — Variant ${num}`,
+      de: isPearl ? "Perlmutt" : `Rauten-Crêpe-Tuch — Variante ${num}`,
+      kk: isPearl ? "Інжу" : `Ромб гофре косынка — Нұсқа ${num}`,
+      uk: isPearl ? "Перлинний" : `Косинка ромб гофре — Варіант ${num}`,
+      uz: isPearl ? "Marvarid" : `Romb gofre ro'molcha — Variant ${num}`,
     },
     image: `/kosynka_romb_gofre/kosynka_romb_gofre_${num}.jpg`,
     price: KOSYNKA_ROMB_GOFRE_PRICE,
@@ -569,7 +571,7 @@ function kosynkaRombGofreProduct(n: number): Product {
   };
 }
 
-const KOSYNKA_ROMB_GOFRE_07: Product[] = Array.from({ length: 7 }, (_, i) =>
+const KOSYNKA_ROMB_GOFRE_08: Product[] = Array.from({ length: 8 }, (_, i) =>
   kosynkaRombGofreProduct(i + 1)
 );
 
@@ -645,6 +647,6 @@ export const products: Product[] = markFirstProductAsExample([
   ...ZAYZH_PROBLESK_03,
   ...ZAYZH_SHIFON_04,
   ...KOSYNKA_KRAP_07,
-  ...KOSYNKA_ROMB_GOFRE_07,
+  ...KOSYNKA_ROMB_GOFRE_08,
   ...SHARF_KRAP_08,
 ]);
