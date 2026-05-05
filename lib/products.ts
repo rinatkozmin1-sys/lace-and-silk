@@ -201,19 +201,33 @@ const GOFRE_PRINT_24: Product[] = Array.from({ length: 24 }, (_, i) =>
 );
 
 const GOFRE_GOROH_PRICE = 1800;
+const SHIFON_GOFRE_GOROH_RU_NAMES = [
+  "Пример",
+  "Пудра",
+  "Белый",
+  "Бежевый",
+  "Чёрный",
+  "Светло серый",
+  "Кофейный",
+  "Коралловый",
+  "Серо голубой",
+  "Оливковый",
+] as const;
+
 function gofreGorohProduct(n: number): Product {
   const num = n.toString().padStart(2, "0");
   const shifonNum = (n - 1).toString().padStart(2, "0");
   const imageName = n === 1 ? "gofre_goroh_01.jpg" : `shifon_gofre_gorox_${shifonNum}.jpg`;
+  const ruName = SHIFON_GOFRE_GOROH_RU_NAMES[n - 1] ?? `Шифон гофре горох ${n}`;
   return {
     id: `gofre-goroh-${num}`,
     name: {
-      ru: `Шифон гофре горох - Вариант ${n}`,
-      en: `Chiffon polka-dot crinkle - Variant ${n}`,
-      de: `Chiffon-Crêpe mit Punkten - Variante ${n}`,
-      kk: `Шифон гофре бұршақ - Нұсқа ${n}`,
-      uk: `Шифон гофре в горошок - Варіант ${n}`,
-      uz: `Shifon nuqtali gofre - Variant ${n}`,
+      ru: ruName,
+      en: ruName,
+      de: ruName,
+      kk: ruName,
+      uk: ruName,
+      uz: ruName,
     },
     image: `/gofre_goroh/${imageName}`,
     price: GOFRE_GOROH_PRICE,
