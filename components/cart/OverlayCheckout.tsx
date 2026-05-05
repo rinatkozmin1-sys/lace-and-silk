@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { ArrowLeft, X } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { CartItem } from "@/components/cart/CartItem";
@@ -17,14 +16,12 @@ type OverlayCheckoutProps = {
   open: boolean;
   onBackToCart: () => void;
   onCloseCart: () => void;
-  onBeforeNavigateHome: () => void;
 };
 
 export function OverlayCheckout({
   open,
   onBackToCart,
   onCloseCart,
-  onBeforeNavigateHome,
 }: OverlayCheckoutProps) {
   const { t } = useI18n();
   const {
@@ -72,6 +69,34 @@ export function OverlayCheckout({
     [onBackToCart]
   );
 
+  const handleCheckout = useCallback(() => {
+    const formatKzt = (amount: number) => `${amount.toLocaleString("ru-KZ")} ₸`;
+    const deliveryLabel =
+      delivery === "pickup"
+        ? t("checkout.deliveryPickup")
+        : delivery === "courier"
+          ? t("checkout.deliveryCourier")
+          : t("checkout.deliveryPost");
+
+    const orderLines = items
+      .map((item) => {
+        const productName = item.product.name.ru;
+        const lineTotal = item.product.price * item.quantity;
+        return `${productName} - ${item.quantity} шт. (${formatKzt(lineTotal)})`;
+      })
+      .join("\n");
+
+    const message =
+      "Здравствуйте! Я хочу оформить заказ:\n" +
+      `${orderLines}\n` +
+      `Способ доставки: ${deliveryLabel}\n` +
+      `Email: ${email.trim() || "-"}\n` +
+      `Итого к оплате: ${formatKzt(totalPrice)}`;
+
+    const url = `https://wa.me/77054161614?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
+  }, [delivery, email, items, t, totalPrice]);
+
   if (!mounted) return null;
 
   return (
@@ -110,17 +135,8 @@ export function OverlayCheckout({
             className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-white/80"
           >
             <ArrowLeft className="h-4 w-4 opacity-80" aria-hidden />
-            {t("checkout.backToCart")}
+            {t("checkout.backToCartClean")}
           </button>
-
-          <Link
-            href="/"
-            scroll={false}
-            onClick={onBeforeNavigateHome}
-            className="absolute left-1/2 top-1/2 max-w-[46%] -translate-x-1/2 -translate-y-1/2 truncate text-center text-sm font-medium text-primary underline-offset-2 transition-colors hover:text-accent hover:underline"
-          >
-            {t("checkout.returnHome")}
-          </Link>
 
           <IconButton
             aria-label={t("checkout.close")}
@@ -259,6 +275,17 @@ export function OverlayCheckout({
               </h3>
               <KaspiPaymentWidget variant="checkout" />
             </div>
+
+            <button
+              type="button"
+              onClick={handleCheckout}
+              className={cn(
+                "mt-5 w-full rounded-xl bg-[#25D366] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(37,211,102,0.24)] transition-all duration-200",
+                "hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[#25D366]/45 focus:ring-offset-2"
+              )}
+            >
+              {t("checkout.confirmWhatsapp")}
+            </button>
           </div>
         </div>
       </div>

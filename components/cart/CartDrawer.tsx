@@ -383,10 +383,6 @@ export function CartDrawer() {
             closeCheckout();
             closeCart();
           }}
-          onBeforeNavigateHome={() => {
-            closeCheckout();
-            closeCart();
-          }}
         />
       </div>
     </Drawer>

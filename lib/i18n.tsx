@@ -243,6 +243,14 @@ export const dictionary = {
       uk: "← До кошика",
       uz: "← Savatga",
     },
+    backToCartClean: {
+      ru: "Назад к корзине",
+      en: "Back to cart",
+      de: "Zurück zum Warenkorb",
+      kk: "Себетке оралу",
+      uk: "Назад до кошика",
+      uz: "Savatga qaytish",
+    },
     returnHome: {
       ru: "Вернуться на Главную",
       en: "Back to Home",
@@ -258,6 +266,14 @@ export const dictionary = {
       kk: "Тапсырыс беру",
       uk: "Оформити замовлення",
       uz: "Buyurtma berish",
+    },
+    confirmWhatsapp: {
+      ru: "Подтвердить заказ (WhatsApp)",
+      en: "Confirm order (WhatsApp)",
+      de: "Bestellung bestätigen (WhatsApp)",
+      kk: "Тапсырысты растау (WhatsApp)",
+      uk: "Підтвердити замовлення (WhatsApp)",
+      uz: "Buyurtmani tasdiqlash (WhatsApp)",
     },
     checkoutTitle: {
       ru: "Оформление заказа",
