@@ -21,7 +21,7 @@ const PILL_KEYWORDS: Record<Exclude<CatalogPillFilter, "all">, readonly string[]
   sharfy: ["шарф"],
   zauzhennye: ["зауженн"],
   /** В т.ч. EN «accessories» из описаний и возможные «заколки» */
-  aksessuary: ["аксессуар", "accessories", "accessoire", "заколк"],
+  aksessuary: ["аксессуар", "accessories", "accessoire", "заколк", "крабик", "невидим", "набор"],
 };
 
 export function productMatchesCatalogPill(product: Product, filter: CatalogPillFilter): boolean {

@@ -13,7 +13,8 @@ export type Material =
   | "Зауженный шифон"
   | "Косынка в фактурный горошек"
   | "Косынка ромб гофре"
-  | "Шарф в фактурный горошек";
+  | "Шарф в фактурный горошек"
+  | "Аксессуары";
 
 export type Badge = "Silk" | "Cashmere" | "New" | null;
 
@@ -62,6 +63,7 @@ export const CATALOG_CATEGORIES = [
   "Косынка в фактурный горошек",
   "Косынка ромб гофре",
   "Шарф в фактурный горошек",
+  "Аксессуары",
 ] as const;
 
 export type CatalogCategoryFilter = (typeof CATALOG_CATEGORIES)[number];
@@ -82,6 +84,7 @@ export const MATERIALS: Material[] = [
   "Косынка в фактурный горошек",
   "Косынка ромб гофре",
   "Шарф в фактурный горошек",
+  "Аксессуары",
 ];
 
 
@@ -102,6 +105,7 @@ export const CATEGORY_COVER_OVERRIDES: Partial<Record<Material, string>> = {
   "Косынка в фактурный горошек": "/kosynka_krap/kosynka_krap_01.jpg",
   "Косынка ромб гофре": "/kosynka_romb_gofre/kosynka_romb_gofre_01.jpg",
   "Шарф в фактурный горошек": "/sharf_krap/sharf_krap_01.jpg",
+  Аксессуары: "/akses/akses{02}.jpg",
 };
 
 /** Размеры по видам (см). */
@@ -710,6 +714,68 @@ const SHARF_KRAP_08: Product[] = Array.from({ length: 8 }, (_, i) =>
   sharfKrapProduct(i + 1)
 );
 
+const AKSES_ITEMS: { num: number; nameRu: string; price: number; size?: string }[] = [
+  { num: 2, nameRu: "Крабик", price: 1100 },
+  { num: 4, nameRu: "Заколка цветочек", price: 1100 },
+  { num: 6, nameRu: "Крабик", price: 1100 },
+  { num: 8, nameRu: "Крабик", price: 1100 },
+  { num: 10, nameRu: "Заколка цветочек", price: 1100 },
+  { num: 12, nameRu: "Заколка цветочек", price: 1100 },
+  { num: 14, nameRu: "Заколка цветочек", price: 1100 },
+  { num: 16, nameRu: "Заколка цветочек", price: 1100 },
+  { num: 18, nameRu: "Заколка цветочек", price: 1100 },
+  { num: 20, nameRu: "Крабик", price: 1100 },
+  { num: 22, nameRu: "Заколка цветочек", price: 1100 },
+  { num: 24, nameRu: "Крабик", price: 1100 },
+  { num: 26, nameRu: "Крабик", price: 1100 },
+  { num: 28, nameRu: "Заколка цветочек", price: 1100 },
+  { num: 30, nameRu: "Заколка в цветочек", price: 1100 },
+  { num: 32, nameRu: "Набор крабиков", price: 1100 },
+  { num: 34, nameRu: "Набор", price: 2000 },
+  { num: 36, nameRu: "Набор крабиков", price: 1100 },
+  { num: 38, nameRu: "Набор заколок цветочек", price: 1100 },
+  { num: 40, nameRu: "Набор заколок цветочек", price: 1100 },
+  { num: 42, nameRu: "Невидимки", price: 650, size: "3,6" },
+  { num: 44, nameRu: "Невидимки", price: 600, size: "5" },
+  { num: 46, nameRu: "Невидимки", price: 600, size: "7" },
+  { num: 48, nameRu: "Невидимки", price: 600, size: "7" },
+  { num: 50, nameRu: "Невидимки", price: 500, size: "3" },
+  { num: 52, nameRu: "Невидимки", price: 600, size: "6" },
+  { num: 54, nameRu: "Невидимки", price: 600, size: "6" },
+  { num: 56, nameRu: "Невидимки", price: 600, size: "6" },
+  { num: 58, nameRu: "Невидимки", price: 800, size: "5,5" },
+  { num: 60, nameRu: "Невидимки", price: 800, size: "5,5" },
+  { num: 62, nameRu: "Невидимки", price: 800, size: "5,5" },
+  { num: 64, nameRu: "Невидимки", price: 1500, size: "7" },
+];
+
+function aksesProduct(item: (typeof AKSES_ITEMS)[number]): Product {
+  const num = item.num.toString().padStart(2, "0");
+  const nameRu = item.nameRu;
+  return {
+    id: `akses-${num}`,
+    name: {
+      ru: nameRu,
+      en: nameRu,
+      de: nameRu,
+      kk: nameRu,
+      uk: nameRu,
+      uz: nameRu,
+    },
+    image: `/akses/akses{${num}}.jpg`,
+    price: item.price,
+    category: "Аксессуары",
+    material: "Аксессуары",
+    size: item.size,
+    badge: "New",
+  };
+}
+
+const AKSES_32: Product[] = AKSES_ITEMS.map(aksesProduct);
+
+/** Категории без демо-карточки «Пример» (все товары продаются) */
+const CATEGORIES_WITHOUT_EXAMPLE = new Set<Material>(["Аксессуары"]);
+
 /** Категории, в которых есть хотя бы один товар, в порядке CATALOG_CATEGORIES */
 export function getCategoryTypesInStock(allProducts: Product[]): Material[] {
   return CATALOG_CATEGORIES.filter(
@@ -726,7 +792,10 @@ export function getCategoryCoverImage(material: Material, allProducts: Product[]
 function markFirstProductAsExample(allProducts: Product[]): Product[] {
   const seen = new Set<Material>();
   return allProducts.map((product) => {
-    const size = MATERIAL_SIZES[product.category];
+    const size = product.size ?? MATERIAL_SIZES[product.category];
+    if (CATEGORIES_WITHOUT_EXAMPLE.has(product.category)) {
+      return size ? { ...product, size } : product;
+    }
     if (seen.has(product.category)) return size ? { ...product, size } : product;
     seen.add(product.category);
     return { ...product, isExample: true, size };
@@ -749,4 +818,5 @@ export const products: Product[] = markFirstProductAsExample([
   ...KOSYNKA_KRAP_07,
   ...KOSYNKA_ROMB_GOFRE_08,
   ...SHARF_KRAP_08,
+  ...AKSES_32,
 ]);

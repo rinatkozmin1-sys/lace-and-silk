@@ -124,4 +124,12 @@ export const CATEGORY_LABELS: Record<CatalogCategoryFilter, Record<Lang, string>
     uk: "Шарф в фактурний горошок",
     uz: "Mayda nuqtali sharf",
   },
+  Аксессуары: {
+    ru: "Аксессуары",
+    en: "Accessories",
+    de: "Accessoires",
+    kk: "Аксессуарлар",
+    uk: "Аксесуари",
+    uz: "Aksessuarlar",
+  },
 };
