@@ -115,6 +115,14 @@ export const CATEGORY_LABELS: Record<CatalogCategoryFilter, Record<Lang, string>
     uk: "Косинка ромб",
     uz: "Romb ro'molcha",
   },
+  "Косынка ромб плиссе": {
+    ru: "Косынка ромб плиссе",
+    en: "Diamond pleated kerchief",
+    de: "Rauten-Plissee-Tuch",
+    kk: "Ромб плиссе косынка",
+    uk: "Косинка ромб пліссе",
+    uz: "Romb plisse ro'molcha",
+  },
   "Косынка ромб гофре": {
     ru: "Косынка ромб гофре",
     en: "Diamond crinkle kerchief",

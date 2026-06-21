@@ -13,6 +13,7 @@ export type Material =
   | "Зауженный шифон"
   | "Косынка в фактурный горошек"
   | "Косынка ромб"
+  | "Косынка ромб плиссе"
   | "Косынка ромб гофре"
   | "Шарф в фактурный горошек"
   | "Аксессуары";
@@ -63,6 +64,7 @@ export const CATALOG_CATEGORIES = [
   "Зауженный шифон",
   "Косынка в фактурный горошек",
   "Косынка ромб",
+  "Косынка ромб плиссе",
   "Косынка ромб гофре",
   "Шарф в фактурный горошек",
   "Аксессуары",
@@ -85,6 +87,7 @@ export const MATERIALS: Material[] = [
   "Зауженный шифон",
   "Косынка в фактурный горошек",
   "Косынка ромб",
+  "Косынка ромб плиссе",
   "Косынка ромб гофре",
   "Шарф в фактурный горошек",
   "Аксессуары",
@@ -107,6 +110,7 @@ export const CATEGORY_COVER_OVERRIDES: Partial<Record<Material, string>> = {
   "Зауженный шифон": "/zayzh_shifon/zayzh_shifon_01.jpg",
   "Косынка в фактурный горошек": "/kosynka_krap/kosynka_krap_01.jpg",
   "Косынка ромб": "/kosynky_romb/kosynky_romb{01}.jpg",
+  "Косынка ромб плиссе": "/kosynka_romb_plisse/kosynka_romb_plisse{01}.jpg",
   "Косынка ромб гофре": "/kosynka_romb_gofre/kosynka_romb_gofre_01.jpg",
   "Шарф в фактурный горошек": "/sharf_krap/sharf_krap_01.jpg",
   Аксессуары: "/akses/akses{02}.jpg",
@@ -126,6 +130,7 @@ export const MATERIAL_SIZES: Partial<Record<Material, string>> = {
   "Зауженный шифон": "9х110",
   "Косынка в фактурный горошек": "65х65",
   "Косынка ромб": "45х85",
+  "Косынка ромб плиссе": "40х85",
   "Косынка ромб гофре": "85х45",
   "Шарф в фактурный горошек": "25х100",
 };
@@ -804,6 +809,32 @@ const KOSYNKA_ROMB_25: Product[] = Array.from({ length: 25 }, (_, i) =>
   kosynkaRombProduct(i + 1)
 );
 
+const KOSYNKA_ROMB_PLISSE_PRICE = 1800;
+
+function kosynkaRombPlisseProduct(n: number): Product {
+  const num = n.toString().padStart(2, "0");
+  return {
+    id: `kosynka-romb-plisse-${num}`,
+    name: {
+      ru: `Вариант ${n}`,
+      en: `Variant ${n}`,
+      de: `Variante ${n}`,
+      kk: `Нұсқа ${n}`,
+      uk: `Варіант ${n}`,
+      uz: `Variant ${n}`,
+    },
+    image: `/kosynka_romb_plisse/kosynka_romb_plisse{${num}}.jpg`,
+    price: KOSYNKA_ROMB_PLISSE_PRICE,
+    category: "Косынка ромб плиссе",
+    material: "Косынка ромб плиссе",
+    badge: "New",
+  };
+}
+
+const KOSYNKA_ROMB_PLISSE_24: Product[] = Array.from({ length: 24 }, (_, i) =>
+  kosynkaRombPlisseProduct(i + 1)
+);
+
 const SHARF_KRAP_PRICE = 1800;
 const SHARF_KRAP_RU_NAMES = [
   "Пример",
@@ -995,6 +1026,7 @@ export const products: Product[] = markFirstProductAsExample([
   ...ZAYZH_SHIFON_04,
   ...KOSYNKA_KRAP_07,
   ...KOSYNKA_ROMB_25,
+  ...KOSYNKA_ROMB_PLISSE_24,
   ...KOSYNKA_ROMB_GOFRE_08,
   ...SHARF_KRAP_08,
   ...AKSES_32,
