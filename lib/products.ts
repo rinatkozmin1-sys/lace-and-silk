@@ -12,6 +12,7 @@ export type Material =
   | "Зауженные с проблеском"
   | "Зауженный шифон"
   | "Косынка в фактурный горошек"
+  | "Косынка ромб"
   | "Косынка ромб гофре"
   | "Шарф в фактурный горошек"
   | "Аксессуары";
@@ -61,6 +62,7 @@ export const CATALOG_CATEGORIES = [
   "Зауженные с проблеском",
   "Зауженный шифон",
   "Косынка в фактурный горошек",
+  "Косынка ромб",
   "Косынка ромб гофре",
   "Шарф в фактурный горошек",
   "Аксессуары",
@@ -82,6 +84,7 @@ export const MATERIALS: Material[] = [
   "Зауженные с проблеском",
   "Зауженный шифон",
   "Косынка в фактурный горошек",
+  "Косынка ромб",
   "Косынка ромб гофре",
   "Шарф в фактурный горошек",
   "Аксессуары",
@@ -103,6 +106,7 @@ export const CATEGORY_COVER_OVERRIDES: Partial<Record<Material, string>> = {
   "Зауженные с проблеском": "/zayzh_problesk/zayzh_problesk_01.jpg",
   "Зауженный шифон": "/zayzh_shifon/zayzh_shifon_01.jpg",
   "Косынка в фактурный горошек": "/kosynka_krap/kosynka_krap_01.jpg",
+  "Косынка ромб": "/kosynky_romb/kosynky_romb{01}.jpg",
   "Косынка ромб гофре": "/kosynka_romb_gofre/kosynka_romb_gofre_01.jpg",
   "Шарф в фактурный горошек": "/sharf_krap/sharf_krap_01.jpg",
   Аксессуары: "/akses/akses{02}.jpg",
@@ -121,6 +125,7 @@ export const MATERIAL_SIZES: Partial<Record<Material, string>> = {
   "Зауженные с проблеском": "9х110",
   "Зауженный шифон": "9х110",
   "Косынка в фактурный горошек": "65х65",
+  "Косынка ромб": "45х85",
   "Косынка ромб гофре": "85х45",
   "Шарф в фактурный горошек": "25х100",
 };
@@ -160,6 +165,80 @@ const SHIFON_COLOR_TRANSLATIONS: Record<string, Omit<LocalizedText, "ru">> = {
   "Сиреневый": { en: "Lilac", de: "Lila", kk: "Сирень", uk: "Бузковий", uz: "Siren" },
   "Кремовый": { en: "Cream", de: "Creme", kk: "Крем", uk: "Кремовий", uz: "Krem rang" },
   "Светло розовый": { en: "Light pink", de: "Hellrosa", kk: "Ашық қызғылт", uk: "Світло-рожевий", uz: "Och pushti" },
+  "Белый в горошек": {
+    en: "White polka dot",
+    de: "Weiß mit Punkten",
+    kk: "Ақ бұршақ",
+    uk: "Білий в горошок",
+    uz: "Oq nuqtali",
+  },
+  "Серый в горошек": {
+    en: "Gray polka dot",
+    de: "Grau mit Punkten",
+    kk: "Сұр бұршақ",
+    uk: "Сірий в горошок",
+    uz: "Kulrang nuqtali",
+  },
+  "Капучино в горошек": {
+    en: "Cappuccino polka dot",
+    de: "Cappuccino mit Punkten",
+    kk: "Капучино бұршақ",
+    uk: "Капучино в горошок",
+    uz: "Kapuchino nuqtali",
+  },
+  "Розовый в горошек": {
+    en: "Pink polka dot",
+    de: "Rosa mit Punkten",
+    kk: "Қызғылт бұршақ",
+    uk: "Рожевий в горошок",
+    uz: "Pushti nuqtali",
+  },
+  "Чёрный в горошек": {
+    en: "Black polka dot",
+    de: "Schwarz mit Punkten",
+    kk: "Қара бұршақ",
+    uk: "Чорний в горошок",
+    uz: "Qora nuqtali",
+  },
+  "Светло коричневый в горошек": {
+    en: "Light brown polka dot",
+    de: "Hellbraun mit Punkten",
+    kk: "Ашық қоңыр бұршақ",
+    uk: "Світло-коричневий в горошок",
+    uz: "Och jigarrang nuqtali",
+  },
+  "Пудра в горошек": {
+    en: "Powder polka dot",
+    de: "Puder mit Punkten",
+    kk: "Пудра бұршақ",
+    uk: "Пудра в горошок",
+    uz: "Pudra nuqtali",
+  },
+  "Голубой в горошек": {
+    en: "Sky blue polka dot",
+    de: "Hellblau mit Punkten",
+    kk: "Көгілдір бұршақ",
+    uk: "Блакитний в горошок",
+    uz: "Havorang nuqtali",
+  },
+  "Морской бриз": {
+    en: "Sea breeze",
+    de: "Meeresbrise",
+    kk: "Теңіз желісі",
+    uk: "Морський бриз",
+    uz: "Dengiz salqinligi",
+  },
+  "Синий": { en: "Blue", de: "Blau", kk: "Көк", uk: "Синій", uz: "Ko'k" },
+  "Хаки в горошек": {
+    en: "Khaki polka dot",
+    de: "Khaki mit Punkten",
+    kk: "Хaki бұршақ",
+    uk: "Хакі в горошок",
+    uz: "Xaki nuqtali",
+  },
+  "Графит": { en: "Graphite", de: "Graphit", kk: "Графит", uk: "Графіт", uz: "Grafit" },
+  "Шоколад": { en: "Chocolate", de: "Schokolade", kk: "Шоколад", uk: "Шоколад", uz: "Shokolad" },
+  "Коричневый": { en: "Brown", de: "Braun", kk: "Қоңыр", uk: "Коричневий", uz: "Jigarrang" },
 };
 
 function localizeShifonColorName(ruName: string): LocalizedText {
@@ -678,6 +757,53 @@ const KOSYNKA_ROMB_GOFRE_08: Product[] = Array.from({ length: 8 }, (_, i) =>
   kosynkaRombGofreProduct(i + 1)
 );
 
+const KOSYNKA_ROMB_PRICE = 1800;
+const KOSYNKA_ROMB_RU_NAMES = [
+  "Белый в горошек",
+  "Серый в горошек",
+  "Капучино в горошек",
+  "Розовый в горошек",
+  "Чёрный в горошек",
+  "Светло коричневый в горошек",
+  "Пудра в горошек",
+  "Голубой в горошек",
+  "Морской бриз",
+  "Синий",
+  "Бежевый",
+  "Чёрный",
+  "Хаки в горошек",
+  "Белый",
+  "Графит",
+  "Шоколад",
+  "Серый",
+  "Пудра",
+  "Капучино",
+  "Коричневый",
+  "Розовый",
+  "Хвойный",
+  "Голубой",
+  "Кремовый",
+  "Сиреневый",
+] as const;
+
+function kosynkaRombProduct(n: number): Product {
+  const num = n.toString().padStart(2, "0");
+  const ruName = KOSYNKA_ROMB_RU_NAMES[n - 1] ?? `Косынка ромб ${num}`;
+  return {
+    id: `kosynka-romb-${num}`,
+    name: localizeShifonColorName(ruName),
+    image: `/kosynky_romb/kosynky_romb{${num}}.jpg`,
+    price: KOSYNKA_ROMB_PRICE,
+    category: "Косынка ромб",
+    material: "Косынка ромб",
+    badge: "New",
+  };
+}
+
+const KOSYNKA_ROMB_25: Product[] = Array.from({ length: 25 }, (_, i) =>
+  kosynkaRombProduct(i + 1)
+);
+
 const SHARF_KRAP_PRICE = 1800;
 const SHARF_KRAP_RU_NAMES = [
   "Пример",
@@ -868,6 +994,7 @@ export const products: Product[] = markFirstProductAsExample([
   ...ZAYZH_PROBLESK_03,
   ...ZAYZH_SHIFON_04,
   ...KOSYNKA_KRAP_07,
+  ...KOSYNKA_ROMB_25,
   ...KOSYNKA_ROMB_GOFRE_08,
   ...SHARF_KRAP_08,
   ...AKSES_32,
