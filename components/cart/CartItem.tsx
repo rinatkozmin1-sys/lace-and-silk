@@ -8,6 +8,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { PriceFx } from "@/components/ui/PriceFx";
 import { ImageModal } from "@/components/ui/ImageModal";
 import { useI18n } from "@/lib/i18n";
+import { getCategoryLabel } from "@/lib/categoryLabels";
 
 export function CartItem({
   item,
@@ -54,7 +55,7 @@ export function CartItem({
         <h3 className="font-product text-xl font-medium leading-tight text-primary md:text-2xl">
           {name}
         </h3>
-        <p className="text-sm text-primary/70">{product.material}</p>
+        <p className="text-sm text-primary/70">{getCategoryLabel(product.material, lang)}</p>
         <div className="mt-1 space-y-0.5">
           <div className="text-primary">
             <PriceFx amountKzt={product.price} className="text-sm md:text-base" />

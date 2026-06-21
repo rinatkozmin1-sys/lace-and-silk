@@ -714,6 +714,66 @@ const SHARF_KRAP_08: Product[] = Array.from({ length: 8 }, (_, i) =>
   sharfKrapProduct(i + 1)
 );
 
+const AKSES_NAME_TRANSLATIONS: Record<string, Omit<LocalizedText, "ru">> = {
+  Крабик: {
+    en: "Hair claw",
+    de: "Haarklammer",
+    kk: "Шаш түйреуі",
+    uk: "Крабик",
+    uz: "Soch qisqichi",
+  },
+  "Заколка цветочек": {
+    en: "Flower clip",
+    de: "Blumen-Haarklammer",
+    kk: "Гülді заколка",
+    uk: "Заколка з квіткою",
+    uz: "Gulli soch qisqichi",
+  },
+  "Заколка в цветочек": {
+    en: "Flower clip",
+    de: "Blumen-Haarklammer",
+    kk: "Гülді заколка",
+    uk: "Заколка з квіткою",
+    uz: "Gulli soch qisqichi",
+  },
+  "Набор крабиков": {
+    en: "Set of hair claws",
+    de: "Set Haarklammern",
+    kk: "Кrabikter жиынтығы",
+    uk: "Набір крабиків",
+    uz: "Soch qisqichlari to'plami",
+  },
+  Набор: {
+    en: "Set",
+    de: "Set",
+    kk: "Жиынтық",
+    uk: "Набір",
+    uz: "To'plam",
+  },
+  "Набор заколок цветочек": {
+    en: "Set of flower clips",
+    de: "Set Blumen-Haarklammern",
+    kk: "Гülді заколкalar жиынтығы",
+    uk: "Набір заколок з квіткою",
+    uz: "Gulli soch qisqichlari to'plami",
+  },
+  Невидимки: {
+    en: "Bobby pins",
+    de: "Haarnadeln",
+    kk: "Шаш токасы",
+    uk: "Невидимки",
+    uz: "Soch to'g'nalari",
+  },
+};
+
+function localizeAksesName(nameRu: string): LocalizedText {
+  const tx = AKSES_NAME_TRANSLATIONS[nameRu];
+  if (!tx) {
+    return { ru: nameRu, en: nameRu, de: nameRu, kk: nameRu, uk: nameRu, uz: nameRu };
+  }
+  return { ru: nameRu, ...tx };
+}
+
 const AKSES_ITEMS: { num: number; nameRu: string; price: number; size?: string }[] = [
   { num: 2, nameRu: "Крабик", price: 1100 },
   { num: 4, nameRu: "Заколка цветочек", price: 1100 },
@@ -751,17 +811,9 @@ const AKSES_ITEMS: { num: number; nameRu: string; price: number; size?: string }
 
 function aksesProduct(item: (typeof AKSES_ITEMS)[number]): Product {
   const num = item.num.toString().padStart(2, "0");
-  const nameRu = item.nameRu;
   return {
     id: `akses-${num}`,
-    name: {
-      ru: nameRu,
-      en: nameRu,
-      de: nameRu,
-      kk: nameRu,
-      uk: nameRu,
-      uz: nameRu,
-    },
+    name: localizeAksesName(item.nameRu),
     image: `/akses/akses{${num}}.jpg`,
     price: item.price,
     category: "Аксессуары",
@@ -789,7 +841,7 @@ export function getCategoryCoverImage(material: Material, allProducts: Product[]
   return allProducts.find((p) => p.category === material)?.image ?? "";
 }
 
-function markFirstProductAsExample(allProducts: Product[]): Product[] {
+export function markFirstProductAsExample(allProducts: Product[]): Product[] {
   const seen = new Set<Material>();
   return allProducts.map((product) => {
     const size = product.size ?? MATERIAL_SIZES[product.category];
@@ -820,3 +872,22 @@ export const products: Product[] = markFirstProductAsExample([
   ...SHARF_KRAP_08,
   ...AKSES_32,
 ]);
+
+const STATIC_NAME_BY_IMAGE = new Map<string, LocalizedText>(
+  products.map((p) => [p.image, p.name])
+);
+
+const STATIC_NAME_BY_CATEGORY_RU = new Map<string, LocalizedText>(
+  products.map((p) => [`${p.category}\0${p.name.ru}`, p.name])
+);
+
+/** Переводы из статического каталога (для строк Supabase с тем же image или RU-названием). */
+export function resolveStaticLocalizedName(
+  image: string,
+  category: string,
+  nameRu: string
+): LocalizedText | undefined {
+  const byImage = STATIC_NAME_BY_IMAGE.get(image);
+  if (byImage) return byImage;
+  return STATIC_NAME_BY_CATEGORY_RU.get(`${category}\0${nameRu.trim()}`);
+}

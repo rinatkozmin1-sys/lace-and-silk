@@ -1,8 +1,9 @@
 "use client";
 
 import {
-  MATERIAL_SIZES,
+  markFirstProductAsExample,
   MATERIALS,
+  resolveStaticLocalizedName,
   type LocalizedText,
   type Material,
   type Product,
@@ -17,15 +18,17 @@ type SupabaseProductRow = {
   category: string;
 };
 
-function toLocalizedText(value: string): LocalizedText {
-  return {
-    ru: value,
-    en: value,
-    de: value,
-    kk: value,
-    uk: value,
-    uz: value,
-  };
+function toLocalizedText(nameRu: string, image: string, category: string): LocalizedText {
+  return (
+    resolveStaticLocalizedName(image, category, nameRu) ?? {
+      ru: nameRu,
+      en: nameRu,
+      de: nameRu,
+      kk: nameRu,
+      uk: nameRu,
+      uz: nameRu,
+    }
+  );
 }
 
 function isMaterial(value: string): value is Material {
@@ -44,7 +47,7 @@ function mapRowToProduct(row: SupabaseProductRow): Product | null {
 
   return {
     id: String(row.id),
-    name: toLocalizedText(row.name),
+    name: toLocalizedText(row.name, row.image, row.category),
     image: row.image,
     price,
     category: row.category,
@@ -79,13 +82,5 @@ export async function fetchProductsFromSupabase(): Promise<{
     .map(mapRowToProduct)
     .filter((item): item is Product => item !== null);
 
-  const seen = new Set<Material>();
-  const productsWithExamples = products.map((product) => {
-    const size = MATERIAL_SIZES[product.category];
-    if (seen.has(product.category)) return size ? { ...product, size } : product;
-    seen.add(product.category);
-    return { ...product, isExample: true, size };
-  });
-
-  return { data: productsWithExamples, error: null };
+  return { data: markFirstProductAsExample(products), error: null };
 }

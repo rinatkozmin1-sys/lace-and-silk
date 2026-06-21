@@ -1,6 +1,5 @@
-import type { CatalogCategoryFilter } from "@/lib/products";
+import type { CatalogCategoryFilter, Material } from "@/lib/products";
 import type { Lang } from "@/lib/i18n";
-
 /** Подписи категорий для фильтра и для карточек уровня 1 */
 export const CATEGORY_LABELS: Record<CatalogCategoryFilter, Record<Lang, string>> = {
   Все: { ru: "Все", en: "All", de: "Alle", kk: "Барлығы", uk: "Усі", uz: "Barchasi" },
@@ -133,3 +132,10 @@ export const CATEGORY_LABELS: Record<CatalogCategoryFilter, Record<Lang, string>
     uz: "Aksessuarlar",
   },
 };
+
+export function getCategoryLabel(
+  category: CatalogCategoryFilter | Material,
+  lang: Lang
+): string {
+  return CATEGORY_LABELS[category as CatalogCategoryFilter]?.[lang] ?? String(category);
+}
